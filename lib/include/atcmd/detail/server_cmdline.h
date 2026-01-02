@@ -572,7 +572,7 @@ private:
 
 	void printCmdParameterRanges(const detail::ExtCmdDef& cmd_def, const char* name)
 	{
-		if (cmd_def.getParameters()->count == 0)
+		if (cmd_def.getParameters() == nullptr)
 		{
 			return;
 		}
