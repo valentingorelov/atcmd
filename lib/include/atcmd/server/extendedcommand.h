@@ -513,7 +513,7 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<class Pl>
 		ParameterInformationTextTmpl<Pl> makeParameterInformationText(const char* name, bool is_result_code = false)
 		{
-			return ParameterInformationTextTmpl<Pl>(m_server, is_result_code, name, !m_is_last_command);
+			return ParameterInformationTextTmpl<Pl>(m_server, is_result_code, name, is_result_code && !m_is_last_command);
 		}
 	};
 

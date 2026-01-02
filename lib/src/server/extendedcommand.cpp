@@ -150,7 +150,7 @@ ExtendedCommandBase::ReadServerHandle::ReadServerHandle(Server& server, bool is_
 ExtendedCommandBase::ReadServerHandle::ParameterInformationText
 ExtendedCommandBase::ReadServerHandle::makeParameterInformationText(const char* name, bool is_result_code)
 {
-	return ParameterInformationText(m_server, is_result_code, name, !m_is_last_command);
+	return ParameterInformationText(m_server, is_result_code, name, is_result_code && !m_is_last_command);
 }
 
 } /* namespace atcmd::server::detail */
