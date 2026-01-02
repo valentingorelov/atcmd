@@ -35,8 +35,8 @@ namespace atcmd::server {
 template<concepts::ServerSettings Settings>
 struct Server : public detail::ServerCmdline<Settings>
 {
-	Server(PrintCharCallback print_char_callback, void* user_handle = nullptr) :
-		detail::ServerCmdline<Settings>(print_char_callback, user_handle),
+	Server(PrintCharCallback print_char_callback, void* context = nullptr) :
+		detail::ServerCmdline<Settings>(print_char_callback, context),
 		m_state{&Server::stateA}
 	{}
 

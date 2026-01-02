@@ -41,7 +41,7 @@ enum class RESULT_CODE
 	ASYNC
 };
 
-typedef void (*PrintCharCallback)(char ch, void* user_handle);
+typedef void (*PrintCharCallback)(char ch, void* context);
 
 } /* namespace atcmd */
 

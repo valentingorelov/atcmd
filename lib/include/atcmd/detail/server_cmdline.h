@@ -105,8 +105,8 @@ template<atcmd::server::concepts::ServerSettings Settings>
 struct ServerCmdline : public detail::Server
 {
 protected:
-	ServerCmdline(PrintCharCallback print_char_callback, void* user_handle = nullptr) :
-		detail::Server(print_char_callback, user_handle)
+	ServerCmdline(PrintCharCallback print_char_callback, void* context = nullptr) :
+		detail::Server(print_char_callback, context)
 	{}
 
 	std::size_t getCmdlineBufSz()

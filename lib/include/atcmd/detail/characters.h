@@ -140,8 +140,8 @@ struct Characters
 		return alphabet[encoded];
 	}
 
-	static void printNumber(uint32_t number, uint8_t base, PrintCharCallback callback, void* user_handle);
-	static void printHexadecimalString(const uint8_t* data, uint16_t size, PrintCharCallback callback, void* user_handle);
+	static void printNumber(uint32_t number, uint8_t base, PrintCharCallback callback, void* context);
+	static void printHexadecimalString(const uint8_t* data, uint16_t size, PrintCharCallback callback, void* context);
 };
 
 }

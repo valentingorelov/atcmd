@@ -35,7 +35,7 @@ SParameters& Server::getCommunicationParameters()
 
 void Server::printChar(char ch)
 {
-	m_print_char_callback(ch, m_user_handle);
+	m_print_char_callback(ch, m_context);
 }
 
 void Server::printText(const char* text)
@@ -48,7 +48,7 @@ void Server::printText(const char* text)
 
 void Server::printNumber(uint32_t number, uint8_t base)
 {
-	atcmd::detail::Characters::printNumber(number, base, m_print_char_callback, m_user_handle);
+	atcmd::detail::Characters::printNumber(number, base, m_print_char_callback, m_context);
 }
 
 void Server::printString(const char* string)
@@ -61,7 +61,7 @@ void Server::printString(const char* string)
 void Server::printHexadecimalString(const uint8_t* data, uint16_t size)
 {
 	printChar('"');
-	atcmd::detail::Characters::printHexadecimalString(data, size, m_print_char_callback, m_user_handle);
+	atcmd::detail::Characters::printHexadecimalString(data, size, m_print_char_callback, m_context);
 	printChar('"');
 }
 
@@ -139,14 +139,14 @@ void Server::setPrintCharCallback(PrintCharCallback print_char_callback)
 	m_print_char_callback = print_char_callback;
 }
 
-void* Server::getUserHandle()
+void* Server::getContext()
 {
-	return m_user_handle;
+	return m_context;
 }
 
-Server::Server(PrintCharCallback print_char_callback, void* user_handle) :
+Server::Server(PrintCharCallback print_char_callback, void* context) :
 	m_print_char_callback{print_char_callback},
-	m_user_handle{user_handle}
+	m_context{context}
 {}
 
 BasicCommandBase::BasicServerHandle Server::getBasicHandle(const uint8_t* param_start, bool is_last_command)

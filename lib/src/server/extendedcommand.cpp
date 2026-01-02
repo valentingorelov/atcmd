@@ -29,7 +29,7 @@
 
 namespace atcmd::server::detail {
 
-static void emptyCharCb(char /*ch*/, void* /*user_handle*/)
+static void emptyCharCb(char /*ch*/, void* /*context*/)
 {
 }
 

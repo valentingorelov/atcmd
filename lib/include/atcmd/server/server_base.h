@@ -63,10 +63,10 @@ public:
 	PrintCharCallback getPrintCharCallback();
 	void setPrintCharCallback(PrintCharCallback print_char_callback);
 
-	void* getUserHandle();
+	void* getContext();
 
 protected:
-	Server(PrintCharCallback print_char_callback, void* user_handle);
+	Server(PrintCharCallback print_char_callback, void* context);
 
 	BasicCommandBase::BasicServerHandle getBasicHandle(const uint8_t* param_start, bool is_last_command);
 
@@ -76,7 +76,7 @@ protected:
 
 private:
 	PrintCharCallback m_print_char_callback;
-	void* m_user_handle;
+	void* m_context;
 
 	SParameters m_s_parameters;
 };

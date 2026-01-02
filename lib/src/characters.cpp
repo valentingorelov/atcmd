@@ -37,7 +37,7 @@ char Characters::toUpper(char ch)
 	return ch;
 }
 
-void Characters::printNumber(uint32_t number, uint8_t base, PrintCharCallback callback, void* user_handle)
+void Characters::printNumber(uint32_t number, uint8_t base, PrintCharCallback callback, void* context)
 {
 	assert(base <= (sizeof(numbers)));
 
@@ -53,18 +53,18 @@ void Characters::printNumber(uint32_t number, uint8_t base, PrintCharCallback ca
 
 	do
 	{
-		callback(numbers[number_reversed % base], user_handle);
+		callback(numbers[number_reversed % base], context);
 		number_reversed /= base;
 	} while (--digit_count != 0);
 }
 
-void Characters::printHexadecimalString(const uint8_t* data, uint16_t size, PrintCharCallback callback, void* user_handle)
+void Characters::printHexadecimalString(const uint8_t* data, uint16_t size, PrintCharCallback callback, void* context)
 {
 	for (uint_fast16_t i = 0; i < size; i++)
 	{
 		uint8_t v = data[i];
-		callback(numbers[v >> 4], user_handle);
-		callback(numbers[v & 0xF], user_handle);
+		callback(numbers[v >> 4], context);
+		callback(numbers[v & 0xF], context);
 	}
 }
 

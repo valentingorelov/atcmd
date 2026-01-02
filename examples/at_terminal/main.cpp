@@ -37,7 +37,7 @@
 #include "commands/extended/test2sds.h"
 #include "commands/extended/test3rsr.h"
 
-static void printChar(char ch, void* /*user_handle*/)
+static void printChar(char ch, void* /*context*/)
 {
 	std::cout << ch;
 }
