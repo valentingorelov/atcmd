@@ -25,14 +25,19 @@
 #ifndef GMI_H
 #define GMI_H
 
-struct Gmi
+#include <atcmd/server/extendedcommand.h>
+
+struct Gmi : public atcmd::server::ExtendedCommand
 {
+	// Request manufacturer identification
 	struct Definition
 	{
-		static constexpr char name[] = "+GMI";
-	};
+		static constexpr char name[] = "GMI";
 
-	static constexpr const char* onAction = "ABCDEF";
+		using Parameters = ParameterList<>;
+
+		static atcmd::RESULT_CODE onRead(ReadServerHandle server_handle);
+	};
 };
 
 #endif // GMI_H

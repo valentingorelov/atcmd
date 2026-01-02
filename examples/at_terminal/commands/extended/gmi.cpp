@@ -23,3 +23,10 @@
  */
 
 #include "gmi.h"
+
+atcmd::RESULT_CODE Gmi::Definition::onRead(ReadServerHandle server_handle)
+{
+	server_handle.makeParameterInformationText(name)
+		.printStringParameter("AtServer Test Manufacturer");
+	return atcmd::RESULT_CODE::OK;
+}

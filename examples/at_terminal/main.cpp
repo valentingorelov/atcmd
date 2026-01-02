@@ -30,6 +30,8 @@
 #include "commands/basic/v.h"
 
 #include "commands/extended/gci.h"
+#include "commands/extended/gmi.h"
+#include "commands/extended/gmm.h"
 #include "commands/extended/mv18am.h"
 #include "commands/extended/test1dhb.h"
 #include "commands/extended/test2sds.h"
@@ -46,6 +48,8 @@ struct ServerSettings
 	using AmpersandCommands = atcmd::server::AmpersandCommandList<V>;
 	using ExtendedCommands = atcmd::server::ExtendedCommandList<
 		Gci,
+		Gmi,
+		Gmm,
 		Mv18am,
 		Test1dhb,
 		Test2sds,

@@ -27,14 +27,17 @@
 
 #include <atcmd/server/extendedcommand.h>
 
-struct Gmm
+struct Gmm : public atcmd::server::ExtendedCommand
 {
+	// Request model identification
 	struct Definition
 	{
-		static constexpr char name[] = "+GMM";
-	};
+		static constexpr char name[] = "GMM";
 
-	static constexpr const char* onAction = "AAABBB";
+		using Parameters = ParameterList<>;
+
+		static atcmd::RESULT_CODE onRead(ReadServerHandle server_handle);
+	};
 };
 
 #endif // GMM_H
