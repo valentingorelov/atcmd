@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef TEST3RSR_H
-#define TEST3RSR_H
+#ifndef ATCMD_TEST3RSR_H
+#define ATCMD_TEST3RSR_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -64,4 +64,4 @@ struct Test3rsr : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // TEST3RSR_H
+#endif // ATCMD_TEST3RSR_H

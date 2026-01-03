@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef TEST2SDS_H
-#define TEST2SDS_H
+#ifndef ATCMD_TEST2SDS_H
+#define ATCMD_TEST2SDS_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -63,4 +63,4 @@ struct Test2sds : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // TEST2SDS_H
+#endif // ATCMD_TEST2SDS_H

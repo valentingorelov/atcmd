@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef TRIEBUILDER_H
-#define TRIEBUILDER_H
+#ifndef ATCMD_TRIEBUILDER_H
+#define ATCMD_TRIEBUILDER_H
 
 #include <array>
 #include <cstdint>
@@ -262,4 +262,4 @@ public:
 
 }
 
-#endif // TRIEBUILDER_H
+#endif // ATCMD_TRIEBUILDER_H

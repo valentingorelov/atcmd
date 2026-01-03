@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef TRIE_H
-#define TRIE_H
+#ifndef ATCMD_TRIE_H
+#define ATCMD_TRIE_H
 
 #include <atcmd/detail/triebuilder.h>
 #include <atcmd/detail/characters.h>
@@ -154,4 +154,4 @@ private:
 
 } /* namespace atcmd::detail */
 
-#endif // TRIE_H
+#endif // ATCMD_TRIE_H

@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef ATCMD_COMMON_H
+#define ATCMD_COMMON_H
 
 namespace atcmd {
 
@@ -45,4 +45,4 @@ typedef void (*PrintCharCallback)(char ch, void* context);
 
 } /* namespace atcmd */
 
-#endif // COMMON_H
+#endif // ATCMD_COMMON_H

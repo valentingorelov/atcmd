@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef ATCMD_SERVER_H
+#define ATCMD_SERVER_H
 
 #include <cstdint>
 
@@ -999,4 +999,4 @@ private:
 
 } /* namespace atcmdlib::server */
 
-#endif // SERVER_H
+#endif // ATCMD_SERVER_H

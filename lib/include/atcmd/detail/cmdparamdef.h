@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef CMDPARAMDEF_H
-#define CMDPARAMDEF_H
+#ifndef ATCMD_CMDPARAMDEF_H
+#define ATCMD_CMDPARAMDEF_H
 
 #include <cstdint>
 
@@ -64,4 +64,4 @@ struct CmdParamDef
 
 } /* namespace atcmd::server::detail */
 
-#endif // CMDPARAMDEF_H
+#endif // ATCMD_CMDPARAMDEF_H

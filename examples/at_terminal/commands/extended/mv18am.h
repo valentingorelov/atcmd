@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef MV18AM_H
-#define MV18AM_H
+#ifndef ATCMD_MV18AM_H
+#define ATCMD_MV18AM_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -48,4 +48,4 @@ struct Mv18am : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // MV18AM_H
+#endif // ATCMD_MV18AM_H

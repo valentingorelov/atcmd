@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef SERVER_BASE_H
-#define SERVER_BASE_H
+#ifndef ATCMD_SERVER_BASE_H
+#define ATCMD_SERVER_BASE_H
 
 #include <atcmd/common.h>
 #include <atcmd/server/basiccommand.h>
@@ -83,4 +83,4 @@ private:
 
 } /* namespace atcmd::server::detail */
 
-#endif // SERVER_BASE_H
+#endif // ATCMD_SERVER_BASE_H

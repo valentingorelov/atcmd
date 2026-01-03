@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef CHARACTERS_H
-#define CHARACTERS_H
+#ifndef ATCMD_CHARACTERS_H
+#define ATCMD_CHARACTERS_H
 
 #include <cstdint>
 #include <assert.h>
@@ -146,4 +146,4 @@ struct Characters
 
 }
 
-#endif // CHARACTERS_H
+#endif // ATCMD_CHARACTERS_H

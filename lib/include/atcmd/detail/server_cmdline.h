@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef SERVER_CMDLINE_H
-#define SERVER_CMDLINE_H
+#ifndef ATCMD_SERVER_CMDLINE_H
+#define ATCMD_SERVER_CMDLINE_H
 
 #include <atcmd/server/server_base.h>
 #include <atcmd/detail/trie.h>
@@ -710,4 +710,4 @@ private:
 } /* namespace detail */
 } /* namespace atcmd::server */
 
-#endif // SERVER_CMDLINE_H
+#endif // ATCMD_SERVER_CMDLINE_H

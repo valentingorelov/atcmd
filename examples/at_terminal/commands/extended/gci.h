@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef GCI_H
-#define GCI_H
+#ifndef ATCMD_GCI_H
+#define ATCMD_GCI_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -48,4 +48,4 @@ struct Gci : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // GCI_H
+#endif // ATCMD_GCI_H

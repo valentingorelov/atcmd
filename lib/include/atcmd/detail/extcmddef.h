@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef EXTCMDDEF_H
-#define EXTCMDDEF_H
+#ifndef ATCMD_EXTCMDDEF_H
+#define ATCMD_EXTCMDDEF_H
 
 #include <array>
 
@@ -308,4 +308,4 @@ private:
 
 } /* namespace atcmd::server::detail */
 
-#endif // EXTCMDDEF_H
+#endif // ATCMD_EXTCMDDEF_H

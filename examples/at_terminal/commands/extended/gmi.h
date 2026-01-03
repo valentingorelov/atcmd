@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef GMI_H
-#define GMI_H
+#ifndef ATCMD_GMI_H
+#define ATCMD_GMI_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -40,4 +40,4 @@ struct Gmi : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // GMI_H
+#endif // ATCMD_GMI_H

@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef EXTENDEDCOMMAND_H
-#define EXTENDEDCOMMAND_H
+#ifndef ATCMD_EXTENDEDCOMMAND_H
+#define ATCMD_EXTENDEDCOMMAND_H
 
 #include <concepts>
 #include <cstdint>
@@ -581,4 +581,4 @@ concept ExtendedCommand =
 
 } /* namespace atcmd::server */
 
-#endif // EXTENDEDCOMMAND_H
+#endif // ATCMD_EXTENDEDCOMMAND_H

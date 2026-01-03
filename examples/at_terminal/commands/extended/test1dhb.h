@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef TEST1DHB_H
-#define TEST1DHB_H
+#ifndef ATCMD_TEST1DHB_H
+#define ATCMD_TEST1DHB_H
 
 #include <atcmd/server/extendedcommand.h>
 
@@ -64,4 +64,4 @@ struct Test1dhb : public atcmd::server::ExtendedCommand
 	};
 };
 
-#endif // TEST1DHB_H
+#endif // ATCMD_TEST1DHB_H

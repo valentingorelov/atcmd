@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef SPARAMETERS_H
-#define SPARAMETERS_H
+#ifndef ATCMD_SPARAMETERS_H
+#define ATCMD_SPARAMETERS_H
 
 namespace atcmd::server {
 
@@ -49,4 +49,4 @@ private:
 
 }
 
-#endif // SPARAMETERS_H
+#endif // ATCMD_SPARAMETERS_H

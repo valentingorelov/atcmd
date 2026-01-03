@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef COMMAND_BASE_H
-#define COMMAND_BASE_H
+#ifndef ATCMD_COMMAND_BASE_H
+#define ATCMD_COMMAND_BASE_H
 
 #include <concepts>
 #include <cstdint>
@@ -173,4 +173,4 @@ struct Command : public CommandBase
 
 } /* namespace atcmd::server */
 
-#endif // COMMAND_BASE_H
+#endif // ATCMD_COMMAND_BASE_H

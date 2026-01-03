@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef BASICCOMMAND_H
-#define BASICCOMMAND_H
+#ifndef ATCMD_BASICCOMMAND_H
+#define ATCMD_BASICCOMMAND_H
 
 #include <atcmd/common.h>
 #include <atcmd/detail/characters.h>
@@ -95,4 +95,4 @@ concept BasicCommand =
 
 } /* namespace atcmd::server */
 
-#endif // BASICCOMMAND_H
+#endif // ATCMD_BASICCOMMAND_H

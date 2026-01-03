@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef BASICCMDDEF_H
-#define BASICCMDDEF_H
+#ifndef ATCMD_BASICCMDDEF_H
+#define ATCMD_BASICCMDDEF_H
 
 #include <atcmd/detail/cmdparamdef.h>
 #include <atcmd/server/basiccommand.h>
@@ -84,4 +84,4 @@ struct BasicCmdDef : public CmdParamDef
 
 } /* namespace atcmd::server::detail */
 
-#endif // BASICCMDDEF_H
+#endif // ATCMD_BASICCMDDEF_H

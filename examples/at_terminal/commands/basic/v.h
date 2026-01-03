@@ -22,8 +22,8 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#ifndef V_H
-#define V_H
+#ifndef ATCMD_V_H
+#define ATCMD_V_H
 
 #include <atcmd/server/basiccommand.h>
 
@@ -45,4 +45,4 @@ struct V : public atcmd::server::BasicCommand
 	};
 };
 
-#endif // V_H
+#endif // ATCMD_V_H
