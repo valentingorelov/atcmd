@@ -59,6 +59,9 @@ struct CommandBase
 
 		Server& m_server;
 		bool m_is_last_command;
+
+	public:
+		InformationText makeInformationText();
 	};
 
 	struct ParamServerHandle

@@ -59,6 +59,7 @@ add_executable(at_terminal
 	examples/at_terminal/commands/extended/test1dhb.h examples/at_terminal/commands/extended/test1dhb.cpp
 	examples/at_terminal/commands/extended/test2sds.h examples/at_terminal/commands/extended/test2sds.cpp
 	examples/at_terminal/commands/extended/test3rsr.h examples/at_terminal/commands/extended/test3rsr.cpp
+	examples/at_terminal/commands/basic/i.h examples/at_terminal/commands/basic/i.cpp
 
 	)
 

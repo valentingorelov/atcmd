@@ -37,6 +37,11 @@ Command::ServerHandle::ServerHandle(Server& server, bool is_last_command) :
 	m_is_last_command{is_last_command}
 {}
 
+CommandBase::ServerHandle::InformationText CommandBase::ServerHandle::makeInformationText()
+{
+	return InformationText(m_server, false);
+}
+
 Command::ServerHandle::InformationText::InformationText(Server& server, bool is_result_code) :
 	m_server{server},
 	m_is_result_code{is_result_code}

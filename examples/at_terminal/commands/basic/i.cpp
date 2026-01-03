@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,64 +22,19 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#include <iostream>
-#include <string>
+#include "i.h"
 
-#include <atcmd/server/server.h>
-
-#include "commands/basic/i.h"
-#include "commands/basic/v.h"
-
-#include "commands/extended/gci.h"
-#include "commands/extended/gmi.h"
-#include "commands/extended/gmm.h"
-#include "commands/extended/mv18am.h"
-#include "commands/extended/test1dhb.h"
-#include "commands/extended/test2sds.h"
-#include "commands/extended/test3rsr.h"
-
-static void printChar(char ch, void* /*context*/)
+atcmd::RESULT_CODE I::Definition::onExec(BasicServerHandle server_handle)
 {
-	std::cout << ch;
-}
-
-struct ServerSettings
-{
-	using BasicCommands = atcmd::server::BasicCommandList<I, V>;
-	using AmpersandCommands = atcmd::server::AmpersandCommandList<V>;
-	using ExtendedCommands = atcmd::server::ExtendedCommandList<
-		Gci,
-		Gmi,
-		Gmm,
-		Mv18am,
-		Test1dhb,
-		Test2sds,
-		Test3rsr
-	>;
-
-	static constexpr std::size_t max_commands_per_line = 3;
-};
-
-atcmd::server::Server<ServerSettings> server(printChar);
-
-
-void execCmd(const std::string& cmd)
-{
-	for (const char& c : cmd)
+	constexpr const char* messages[] =
 	{
-		server.feed(c);
-	}
-	server.feed('\r');
-}
+		"Information 0",
+		"Information 1",
+		"Information 2",
+		"Information 3",
+	};
 
-int main()
-{
-	std::string cmd;
-	while (true)
-	{
-		std::getline(std::cin, cmd);
-		execCmd(cmd);
-	}
-
-	return 0;
+	Parameters parameters(server_handle);
+	server_handle.makeInformationText().printText(messages[parameters.getNumeric<InformationType>()]);
+	return atcmd::RESULT_CODE::OK;
 }
