@@ -51,6 +51,7 @@ struct CommandBase
 			void printText(const char* text) &&;
 			void printText(const char* text) & = delete;
 
+		protected:
 			Server& m_server;
 			bool m_is_result_code;
 		};
@@ -69,6 +70,8 @@ struct CommandBase
 		ParamServerHandle(const uint8_t* param_start);
 
 		const uint8_t* getParamStart() const;
+
+	private:
 		const uint8_t* m_param_start;
 	};
 
