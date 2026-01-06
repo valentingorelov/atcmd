@@ -281,25 +281,25 @@ protected:
 	{
 		while (m_cmdline_exec_index != m_cmdline_parse_ok_index)
 		{
-			uint16_t vl = getCurrentCmdId();
+			uint16_t cmd_id = getCurrentCmdId();
 			if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
 			{
-				if (vl >= getBasicCmdOffset())
+				if (cmd_id >= getBasicCmdOffset())
 				{
-					uint16_t cmd_index = vl - getBasicCmdOffset();
+					uint16_t cmd_index = cmd_id - getBasicCmdOffset();
 					execBasicCmd(cmd_index);
 				}
 				else
 				{
-					uint16_t cmd_index = vl >> 2;
-					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(vl & 0x03);
+					uint16_t cmd_index = cmd_id >> 2;
+					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
 					execExtendedCmd(cmd_index, cmd_type);
 				}
 			}
 			else
 			{
-				uint16_t cmd_index = vl >> 2;
-				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(vl & 0x03);
+				uint16_t cmd_index = cmd_id >> 2;
+				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
 				execExtendedCmd(cmd_index, cmd_type);
 			}
 
