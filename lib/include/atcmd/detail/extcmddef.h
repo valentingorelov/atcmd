@@ -145,7 +145,6 @@ public:
 		bool readable : 1;
 		bool writable : 1;
 		bool custom_testable : 1;
-		bool abortable : 1;
 
 		bool single_method : 1;
 	};
@@ -162,7 +161,6 @@ private:
 		ExtendedCommandBase::WriteMethod write;
 		ExtendedCommandBase::ReadMethod read;
 		ExtendedCommandBase::TestMethod test;
-		ExtendedCommandBase::AbortMethod abort;
 	};
 
 	union Methods
@@ -218,10 +216,6 @@ private:
 			{
 				r[i++].test = AtCmd::Definition::onTest;
 			}
-			if constexpr (flags.abortable)
-			{
-				r[i++].abort = AtCmd::Definition::onAbort;
-			}
 			return r;
 		}
 
@@ -238,11 +232,10 @@ public:
 			.readable = atcmd::server::concepts::ExtendedReadCommand<AtCmd>,
 			.writable = atcmd::server::concepts::ExtendedWriteCommand<AtCmd>,
 			.custom_testable = atcmd::server::concepts::ExtendedTestCommand<AtCmd>,
-			.abortable = atcmd::server::concepts::ExtendedAbortCommand<AtCmd>,
 			.single_method = false
 		};
 		static constexpr uint8_t method_count =
-				flags.readable + flags.writable + flags.custom_testable + flags.abortable;
+				flags.readable + flags.writable + flags.custom_testable;
 
 		ExtCmdDef r = {};
 		r.m_flags = flags;
@@ -261,10 +254,6 @@ public:
 			if constexpr (flags.custom_testable)
 			{
 				r.m_methods.method.test = AtCmd::Definition::onTest;
-			}
-			if constexpr (flags.abortable)
-			{
-				r.m_methods.method.abort = AtCmd::Definition::onAbort;
 			}
 		}
 		else
@@ -288,7 +277,6 @@ public:
 	ExtendedCommandBase::ReadMethod getReadMethod() const;
 	ExtendedCommandBase::WriteMethod getWriteMethod() const;
 	ExtendedCommandBase::TestMethod getTestMethod() const;
-	ExtendedCommandBase::AbortMethod getAbortMethod() const;
 
 	constexpr const Parameters* getParameters() const
 	{

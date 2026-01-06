@@ -68,18 +68,4 @@ ExtendedCommandBase::TestMethod ExtCmdDef::getTestMethod() const
 	return m_methods.methods[2 - !m_flags.readable - !m_flags.writable].test;
 }
 
-ExtendedCommandBase::AbortMethod ExtCmdDef::getAbortMethod() const
-{
-	if (!m_flags.abortable)
-	{
-		return nullptr;
-	}
-
-	if (m_flags.single_method)
-	{
-		return m_methods.method.abort;
-	}
-	return m_methods.methods[3 - !m_flags.readable - !m_flags.writable - !m_flags.custom_testable].abort;
-}
-
 } /* atcmd::server::detail */

@@ -520,7 +520,6 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 	using ReadMethod = atcmd::RESULT_CODE (*)(ReadServerHandle);
 	using WriteMethod = atcmd::RESULT_CODE (*)(WriteServerHandle);
 	using TestMethod = const char* (*)(TestServerHandle);
-	using AbortMethod = void (*)(ServerHandle);
 };
 
 } /* namespace detail */
@@ -561,12 +560,6 @@ template<class T>
 concept ExtendedTestCommand = requires
 {
 	{ static_cast<detail::ExtendedCommandBase::TestMethod>(&T::Definition::onTest) };
-};
-
-template<class T>
-concept ExtendedAbortCommand = requires
-{
-	{ static_cast<detail::ExtendedCommandBase::AbortMethod>(&T::Definition::onAbort) };
 };
 
 template<class T>
