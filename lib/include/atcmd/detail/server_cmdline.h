@@ -281,38 +281,26 @@ protected:
 	{
 		while (m_cmdline_exec_index != m_cmdline_parse_ok_index)
 		{
-			// Extract cmd index
-			uint16_t vl = m_cmdline[m_cmdline_exec_index] & 0x7F;
-			uint_fast8_t vl_size;
-			if (m_cmdline[m_cmdline_exec_index] & 0x80)
-			{
-				vl += m_cmdline[m_cmdline_exec_index + 1] << 7;
-				vl_size = 2;
-			}
-			else
-			{
-				vl_size = 1;
-			}
-
+			uint16_t vl = getCurrentCmdId();
 			if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
 			{
 				if (vl >= getBasicCmdOffset())
 				{
 					uint16_t cmd_index = vl - getBasicCmdOffset();
-					execBasicCmd(cmd_index, vl_size);
+					execBasicCmd(cmd_index);
 				}
 				else
 				{
 					uint16_t cmd_index = vl >> 2;
 					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(vl & 0x03);
-					execExtendedCmd(cmd_index, cmd_type, vl_size);
+					execExtendedCmd(cmd_index, cmd_type);
 				}
 			}
 			else
 			{
 				uint16_t cmd_index = vl >> 2;
 				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(vl & 0x03);
-				execExtendedCmd(cmd_index, cmd_type, vl_size);
+				execExtendedCmd(cmd_index, cmd_type);
 			}
 
 			if (m_last_result_code == RESULT_CODE::ERROR)
@@ -361,22 +349,12 @@ private:
 
 	bool addCmd(uint16_t vl)
 	{
-		uint_fast8_t sz = 1 + (vl > 0x7F);
-		if (getCmdlineBufSz() < sz)
+		if (getCmdlineBufSz() < sizeof(uint16_t))
 		{
 			return false;
 		}
-		m_cmdline[m_cmdline_parse_index] = vl & 0x7F;
-		if (sz == 2)
-		{
-			m_cmdline[m_cmdline_parse_index++] |= 0x80;
-			vl >>= 7;
-			m_cmdline[m_cmdline_parse_index++] = vl & 0xFF;
-		}
-		else
-		{
-			m_cmdline_parse_index++;
-		}
+		m_cmdline[m_cmdline_parse_index++] = vl & 0xFF;
+		m_cmdline[m_cmdline_parse_index++] = vl >> 8;
 		return true;
 	}
 
@@ -421,17 +399,17 @@ private:
 		m_cmdline_parse_index += sizeof(uint16_t);
 	}
 
-	void execBasicCmd(uint16_t cmd_index, uint_fast8_t vl_size)
+	void execBasicCmd(uint16_t cmd_index)
 	{
 		if (cmd_index == 0)
 		{
 			// S parameter
-			uint8_t param_index = m_cmdline[m_cmdline_exec_index + vl_size];
+			uint8_t param_index = m_cmdline[m_cmdline_exec_index + sizeof(uint16_t)];
 			if (param_index & 0x80)
 			{
 				// Write request
 				param_index &= 0x7F;
-				char ch = m_cmdline[m_cmdline_exec_index + vl_size + 1];
+				char ch = m_cmdline[m_cmdline_exec_index + sizeof(uint16_t) + 1];
 				switch (param_index) {
 				case 3:
 					getCommunicationParameters().setCmdLineTerminationChar(ch);
@@ -441,7 +419,7 @@ private:
 				default:
 					break;
 				}
-				m_cmdline_exec_index += vl_size + 2;
+				m_cmdline_exec_index += sizeof(uint16_t) + 2;
 			}
 			else
 			{
@@ -465,7 +443,7 @@ private:
 				}
 				printInformationTextTrailer();
 
-				m_cmdline_exec_index += vl_size + 1;
+				m_cmdline_exec_index += sizeof(uint16_t) + 1;
 			}
 			m_last_result_code = RESULT_CODE::OK;
 			return;
@@ -489,12 +467,12 @@ private:
 			}
 		}
 
-		std::size_t next_exec_index = m_cmdline_exec_index + vl_size;
+		std::size_t next_exec_index = m_cmdline_exec_index + sizeof(uint16_t);
 		const uint8_t* param_start;
 		if (cmd_def->numeric_ranges != nullptr)
 		{
 			next_exec_index += sizeof(uint32_t);
-			param_start = &m_cmdline[m_cmdline_exec_index + vl_size];
+			param_start = &m_cmdline[m_cmdline_exec_index + sizeof(uint16_t)];
 		}
 		else
 		{
@@ -511,11 +489,11 @@ private:
 		}
 	}
 
-	void execExtendedCmd(uint16_t cmd_index, CMD_TYPE cmd_type, uint_fast8_t vl_size)
+	void execExtendedCmd(uint16_t cmd_index, CMD_TYPE cmd_type)
 	{
 		const detail::ExtCmdDef& cmd_def = Settings::ExtendedCommands::m_ext_cmd_defs[cmd_index];
 
-		std::size_t next_exec_index = m_cmdline_exec_index + vl_size;
+		std::size_t next_exec_index = m_cmdline_exec_index + sizeof(uint16_t);
 		if ((cmd_type == CMD_TYPE::WRITE) && (cmd_def.getParameters() != nullptr))
 		{
 			for (std::size_t j = 0; j < cmd_def.getParameters()->count; j++)
@@ -543,7 +521,7 @@ private:
 			m_last_result_code = cmd_def.getReadMethod()(getReadHandle(is_last));
 			break;
 		case CMD_TYPE::WRITE:
-			m_last_result_code = cmd_def.getWriteMethod()(getWriteHandle(&m_cmdline[m_cmdline_exec_index + vl_size], is_last));
+			m_last_result_code = cmd_def.getWriteMethod()(getWriteHandle(&m_cmdline[m_cmdline_exec_index + sizeof(uint16_t)], is_last));
 			break;
 		case CMD_TYPE::TEST:
 			for (detail::ExtendedCommandBase::TestMethod method = cmd_def.getTestMethod(); method != nullptr;)
@@ -648,6 +626,11 @@ private:
 		}
 
 		printInformationTextTrailer();
+	}
+
+	uint16_t getCurrentCmdId() const
+	{
+		return m_cmdline[m_cmdline_exec_index] | (m_cmdline[m_cmdline_exec_index + 1] << 8);
 	}
 
 	static consteval std::size_t calcCmdlineSize()
