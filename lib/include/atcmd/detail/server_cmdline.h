@@ -305,7 +305,8 @@ protected:
 
 			if (m_last_result_code == RESULT_CODE::ERROR)
 			{
-				return false;
+				m_error = true;
+				break;
 			}
 			if (m_last_result_code == RESULT_CODE::ASYNC)
 			{
