@@ -32,6 +32,13 @@ set(LIB_HEADERS
     include/atcmd/server/command_base.h
     include/atcmd/server/basiccommand.h
     include/atcmd/server/server_base.h
+    include/atcmd/detail/basiccmddef.h
+    include/atcmd/detail/characters.h
+    include/atcmd/detail/cmdparamdef.h
+    include/atcmd/detail/extcmddef.h
+    include/atcmd/detail/server_cmdline.h
+    include/atcmd/detail/triebuilder.h
+    include/atcmd/detail/trie.h
 )
 
 # Create the library
