@@ -139,6 +139,11 @@ void Server::setPrintCharCallback(PrintCharCallback print_char_callback)
 	m_print_char_callback = print_char_callback;
 }
 
+void Server::setContext(void* context)
+{
+	m_context = context;
+}
+
 void* Server::getContext()
 {
 	return m_context;

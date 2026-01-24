@@ -63,6 +63,7 @@ public:
 	PrintCharCallback getPrintCharCallback();
 	void setPrintCharCallback(PrintCharCallback print_char_callback);
 
+	void setContext(void* context);
 	void* getContext();
 
 protected:
