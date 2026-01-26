@@ -199,7 +199,10 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 	protected:
 		struct ExtendedInformationText : public InformationText
 		{
+		protected:
 			ExtendedInformationText(Server& server, bool is_result_code, const char* name, bool is_silent);
+
+		public:
 			~ExtendedInformationText();
 
 		private:
@@ -230,10 +233,13 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 
 		struct ParameterInformationText : public ExtendedInformationText
 		{
+			friend class ReadServerHandle;
 			friend struct ParameterInformationTextSecond;
 
+		protected:
 			ParameterInformationText(Server& server, bool is_result_code, const char* name, bool is_silent);
 
+		public:
 			ParameterInformationTextSecond printNumericParameter(uint32_t value, uint8_t base) &&;
 			ParameterInformationTextSecond printNumericParameter(uint32_t value, uint8_t base) & = delete;
 
@@ -255,10 +261,14 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<atcmd::server::concepts::DecimalNumericParameter T, class... Ts>
 		struct ParameterInformationTextTmpl<ParameterList<T, Ts...>> : private ParameterInformationText
 		{
+			friend class ReadServerHandle;
+
+		protected:
 			ParameterInformationTextTmpl(Server& server, bool is_result_code, const char* name, bool is_silent) :
 				ParameterInformationText(server, is_result_code, name, is_silent)
 			{}
 
+		public:
 			template<atcmd::server::concepts::DecimalNumericParameter P>
 			ParameterInformationTextSecondTmpl<ParameterList<Ts...>>
 			printNumericParameter(uint32_t value, uint8_t base = 10) &&
@@ -276,10 +286,14 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<atcmd::server::concepts::HexadecimalNumericParameter T, class... Ts>
 		struct ParameterInformationTextTmpl<ParameterList<T, Ts...>> : private ParameterInformationText
 		{
+			friend class ReadServerHandle;
+
+		protected:
 			ParameterInformationTextTmpl(Server& server, bool is_result_code, const char* name, bool is_silent) :
 				ParameterInformationText(server, is_result_code, name, is_silent)
 			{}
 
+		public:
 			template<atcmd::server::concepts::HexadecimalNumericParameter P>
 			ParameterInformationTextSecondTmpl<ParameterList<Ts...>>
 			printNumericParameter(uint32_t value, uint8_t base = 16) &&
@@ -299,10 +313,14 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<atcmd::server::concepts::BinaryNumericParameter T, class... Ts>
 		struct ParameterInformationTextTmpl<ParameterList<T, Ts...>> : private ParameterInformationText
 		{
+			friend class ReadServerHandle;
+
+		protected:
 			ParameterInformationTextTmpl(Server& server, bool is_result_code, const char* name, bool is_silent) :
 				ParameterInformationText(server, is_result_code, name, is_silent)
 			{}
 
+		public:
 			template<atcmd::server::concepts::BinaryNumericParameter P>
 			ParameterInformationTextSecondTmpl<ParameterList<Ts...>>
 			printNumericParameter(uint32_t value, uint8_t base = 2) &&
@@ -322,10 +340,14 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<atcmd::server::concepts::StringParameter T, class... Ts>
 		struct ParameterInformationTextTmpl<ParameterList<T, Ts...>> : private ParameterInformationText
 		{
+			friend class ReadServerHandle;
+
+		protected:
 			ParameterInformationTextTmpl(Server& server, bool is_result_code, const char* name, bool is_silent) :
 				ParameterInformationText(server, is_result_code, name, is_silent)
 			{}
 
+		public:
 			template<atcmd::server::concepts::StringParameter P>
 			ParameterInformationTextSecondTmpl<ParameterList<Ts...>>
 			printStringParameter(const char* s) &&
@@ -345,10 +367,14 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<atcmd::server::concepts::HexadecimalStringParameter T, class... Ts>
 		struct ParameterInformationTextTmpl<ParameterList<T, Ts...>> : private ParameterInformationText
 		{
+			friend class ReadServerHandle;
+
+		protected:
 			ParameterInformationTextTmpl(Server& server, bool is_result_code, const char* name, bool is_silent) :
 				ParameterInformationText(server, is_result_code, name, is_silent)
 			{}
 
+		public:
 			template<atcmd::server::concepts::HexadecimalStringParameter P>
 			ParameterInformationTextSecondTmpl<ParameterList<Ts...>>
 			printHexadecimalStringParameter(const uint8_t* data, uint16_t size) &&
@@ -367,8 +393,12 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 
 		struct ParameterInformationTextSecond
 		{
+			friend struct ParameterInformationText;
+
+		protected:
 			explicit ParameterInformationTextSecond(Server& server);
 
+		public:
 			ParameterInformationTextSecond&& printNumericParameter(uint32_t value, uint8_t base) &&;
 			ParameterInformationTextSecond&& printNumericParameter(uint32_t value, uint8_t base) & = delete;
 
@@ -389,6 +419,7 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		template<template<class...> class Pl>
 		struct ParameterInformationTextSecondTmpl<Pl<>>
 		{
+			// TODO move to protected, give friend access (does not work now for some reason)
 			explicit ParameterInformationTextSecondTmpl(Server&) {};
 		};
 

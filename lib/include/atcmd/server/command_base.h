@@ -54,7 +54,12 @@ struct CommandBase
 	protected:
 		struct InformationText
 		{
+			friend struct ServerHandle;
+
+		protected:
 			InformationText(Server& server, bool is_result_code);
+
+		public:
 			~InformationText();
 
 			void printText(const char* text) &&;
