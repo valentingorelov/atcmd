@@ -182,8 +182,8 @@ protected:
 
 	bool addExtCmd(uint16_t cmd_index, CMD_TYPE cmd_type)
 	{
-		uint16_t vl = (cmd_index << 2) | static_cast<uint16_t>(cmd_type);
-		return addCmd(vl);
+		uint16_t cmd_id = (cmd_index << 2) | static_cast<uint16_t>(cmd_type);
+		return addCmd(cmd_id);
 	}
 
 	bool addByteParameter()
@@ -406,14 +406,14 @@ protected:
 	};
 
 private:
-	bool addCmd(uint16_t vl)
+	bool addCmd(uint16_t cmd_id)
 	{
 		if (getCmdlineBufSz() < sizeof(uint16_t))
 		{
 			return false;
 		}
-		m_cmdline[m_cmdline_parse_index++] = vl & 0xFF;
-		m_cmdline[m_cmdline_parse_index++] = vl >> 8;
+		m_cmdline[m_cmdline_parse_index++] = cmd_id & 0xFF;
+		m_cmdline[m_cmdline_parse_index++] = cmd_id >> 8;
 		return true;
 	}
 
