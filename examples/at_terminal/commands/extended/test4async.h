@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,43 +22,43 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#include <string>
+#ifndef ATCMD_TEST4ASYNC_H
+#define ATCMD_TEST4ASYNC_H
 
-#include "server_config.h"
-#include "asyncinput.h"
-#include "asyncioemulator.h"
+#include <atcmd/server/extendedcommand.h>
 
-void execCmd(const std::string& cmd)
+struct Test4async : public atcmd::server::ExtendedCommand
 {
-	for (const char& c : cmd)
+	// Test command
+	// Accepts 3 decimal integers. Demonstrates asynchronous processing.
+	struct Definition
 	{
-		server.feed(c);
-	}
-	server.feed('\r');
-}
+		static constexpr char name[] = "TEST4_ASYNC";
 
-int main()
-{
-	std::condition_variable l_cond;
-	std::mutex l_mutex;
-	std::unique_lock lock(l_mutex);
-
-	AsyncInput input(l_mutex, l_cond);
-	std::string cmd;
-
-	AsyncIoEmulator emulator(l_mutex, l_cond);
-	server.setContext(&emulator);
-
-	while (true)
-	{
-		l_cond.wait(lock);
-		cmd = input.getLine();
-		if (!cmd.empty())
+		struct Param0 : public DecimalNumericParameter
 		{
-			execCmd(cmd);
-		}
-		emulator.poll();
-	}
+			static constexpr bool is_optional = false;
+			static constexpr Range ranges[] = {{0, 255}};
+		};
 
-	return 0;
-}
+		struct Param1 : public DecimalNumericParameter
+		{
+			static constexpr bool is_optional = false;
+			static constexpr Range ranges[] = {{0, 255}};
+		};
+
+		struct Param2 : public DecimalNumericParameter
+		{
+			static constexpr bool is_optional = false;
+			static constexpr Range ranges[] = {{0, 255}};
+		};
+
+		using Parameters = ParameterList<Param0, Param1, Param2>;
+
+		static atcmd::RESULT_CODE onWrite(WriteServerHandle server_handle);
+		static atcmd::RESULT_CODE onRead(ReadServerHandle server_handle);
+		static const char* onTest(TestServerHandle server_handle);
+	};
+};
+
+#endif // ATCMD_TEST4ASYNC_H

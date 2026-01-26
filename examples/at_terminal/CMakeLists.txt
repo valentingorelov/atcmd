@@ -11,6 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Example sources
 set(EXAMPLE_SOURCES
     main.cpp
+    server_config.cpp server_config.h
+    asyncioemulator.cpp asyncioemulator.h
+    asyncinput.cpp asyncinput.h
+    asyncworker.cpp asyncworker.h
     commands/basic/i.cpp commands/basic/i.h
     commands/basic/v.cpp commands/basic/v.h
     commands/extended/gci.cpp commands/extended/gci.h
@@ -20,6 +24,7 @@ set(EXAMPLE_SOURCES
     commands/extended/test1dhb.cpp commands/extended/test1dhb.h
     commands/extended/test2sds.cpp commands/extended/test2sds.h
     commands/extended/test3rsr.cpp commands/extended/test3rsr.h
+    commands/extended/test4async.cpp commands/extended/test4async.h
 )
 
 # Create the executable

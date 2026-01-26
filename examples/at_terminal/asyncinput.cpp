@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,43 +22,40 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#include <string>
-
-#include "server_config.h"
 #include "asyncinput.h"
-#include "asyncioemulator.h"
 
-void execCmd(const std::string& cmd)
+#include <iostream>
+
+AsyncInput::AsyncInput(std::mutex& mutex, std::condition_variable& cond) :
+	AsyncWorker(mutex, cond)
 {
-	for (const char& c : cmd)
-	{
-		server.feed(c);
-	}
-	server.feed('\r');
+	start();
 }
 
-int main()
+std::string AsyncInput::getLine()
 {
-	std::condition_variable l_cond;
-	std::mutex l_mutex;
-	std::unique_lock lock(l_mutex);
-
-	AsyncInput input(l_mutex, l_cond);
-	std::string cmd;
-
-	AsyncIoEmulator emulator(l_mutex, l_cond);
-	server.setContext(&emulator);
-
-	while (true)
+	std::string r;
+	if (m_ready)
 	{
-		l_cond.wait(lock);
-		cmd = input.getLine();
-		if (!cmd.empty())
-		{
-			execCmd(cmd);
-		}
-		emulator.poll();
+		r = m_line.get();
+		start();
 	}
+	return r;
+}
 
-	return 0;
+void AsyncInput::start()
+{
+	m_ready = false;
+	m_line = std::async(std::launch::async, &AsyncInput::getLine_, this);
+}
+
+std::string AsyncInput::getLine_()
+{
+	std::string cmd;
+	std::getline(std::cin, cmd);
+
+	std::lock_guard lock(m_mutex);
+	m_ready = true;
+	m_cond.notify_all();
+	return cmd;
 }

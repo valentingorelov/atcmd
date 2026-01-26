@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,43 +22,41 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#include <string>
+#ifndef SERVER_CONFIG_H
+#define SERVER_CONFIG_H
 
-#include "server_config.h"
-#include "asyncinput.h"
-#include "asyncioemulator.h"
+#include <atcmd/server/server.h>
 
-void execCmd(const std::string& cmd)
+#include "commands/basic/i.h"
+#include "commands/basic/v.h"
+
+#include "commands/extended/gci.h"
+#include "commands/extended/gmi.h"
+#include "commands/extended/gmm.h"
+#include "commands/extended/mv18am.h"
+#include "commands/extended/test1dhb.h"
+#include "commands/extended/test2sds.h"
+#include "commands/extended/test3rsr.h"
+#include "commands/extended/test4async.h"
+
+struct ServerSettings
 {
-	for (const char& c : cmd)
-	{
-		server.feed(c);
-	}
-	server.feed('\r');
-}
+	using BasicCommands = atcmd::server::BasicCommandList<I, V>;
+	using AmpersandCommands = atcmd::server::AmpersandCommandList<V>;
+	using ExtendedCommands = atcmd::server::ExtendedCommandList<
+		Gci,
+		Gmi,
+		Gmm,
+		Mv18am,
+		Test1dhb,
+		Test2sds,
+		Test3rsr,
+		Test4async
+	>;
 
-int main()
-{
-	std::condition_variable l_cond;
-	std::mutex l_mutex;
-	std::unique_lock lock(l_mutex);
+	static constexpr std::size_t max_commands_per_line = 3;
+};
 
-	AsyncInput input(l_mutex, l_cond);
-	std::string cmd;
+extern atcmd::server::Server<ServerSettings> server;
 
-	AsyncIoEmulator emulator(l_mutex, l_cond);
-	server.setContext(&emulator);
-
-	while (true)
-	{
-		l_cond.wait(lock);
-		cmd = input.getLine();
-		if (!cmd.empty())
-		{
-			execCmd(cmd);
-		}
-		emulator.poll();
-	}
-
-	return 0;
-}
+#endif // SERVER_CONFIG_H

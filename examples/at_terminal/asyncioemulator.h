@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,43 +22,42 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
-#include <string>
+#ifndef ASYNCIOEMULATOR_H
+#define ASYNCIOEMULATOR_H
 
-#include "server_config.h"
-#include "asyncinput.h"
-#include "asyncioemulator.h"
+#include "asyncworker.h"
 
-void execCmd(const std::string& cmd)
+#include <atomic>
+#include <future>
+#include <thread>
+#include <cstdint>
+
+struct AsyncIoEmulator : public AsyncWorker
 {
-	for (const char& c : cmd)
-	{
-		server.feed(c);
-	}
-	server.feed('\r');
-}
+	AsyncIoEmulator(std::mutex& mutex, std::condition_variable& cond);
 
-int main()
-{
-	std::condition_variable l_cond;
-	std::mutex l_mutex;
-	std::unique_lock lock(l_mutex);
+	void write(uint_fast8_t index, uint32_t data);
+	void writeTerminate();
 
-	AsyncInput input(l_mutex, l_cond);
-	std::string cmd;
+	void read();
+	void get(uint32_t& d0, uint32_t& d1, uint32_t& d2) const;
 
-	AsyncIoEmulator emulator(l_mutex, l_cond);
-	server.setContext(&emulator);
+	void poll();
 
-	while (true)
-	{
-		l_cond.wait(lock);
-		cmd = input.getLine();
-		if (!cmd.empty())
-		{
-			execCmd(cmd);
-		}
-		emulator.poll();
-	}
+private:
+	void write_(uint_fast8_t index, uint32_t data);
+	void read_(std::stop_token stop_token);
 
-	return 0;
-}
+	mutable std::mutex m_data_mutex;
+	uint32_t m_d[3];
+
+	std::atomic_bool  m_write_ongoing;
+	std::atomic_bool  m_write_done;
+	std::atomic_bool  m_write_terminated;
+	std::future<void> m_write_future;
+
+	std::atomic_bool  m_read_done;
+	std::jthread      m_read_thread;
+};
+
+#endif // ASYNCIOEMULATOR_H

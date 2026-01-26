@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025 Valentin Gorelov
+* Copyright © 2026 Valentin Gorelov
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the “Software”), to deal in the Software without restriction,
@@ -22,43 +22,27 @@
  * @author Valentin Gorelov <gorelov.valentin@gmail.com>
  */
 
+#ifndef ASYNCINPUT_H
+#define ASYNCINPUT_H
+
+#include <atomic>
+#include <future>
 #include <string>
 
-#include "server_config.h"
-#include "asyncinput.h"
-#include "asyncioemulator.h"
+#include "asyncworker.h"
 
-void execCmd(const std::string& cmd)
+struct AsyncInput : public AsyncWorker
 {
-	for (const char& c : cmd)
-	{
-		server.feed(c);
-	}
-	server.feed('\r');
-}
+	AsyncInput(std::mutex& mutex, std::condition_variable& cond);
 
-int main()
-{
-	std::condition_variable l_cond;
-	std::mutex l_mutex;
-	std::unique_lock lock(l_mutex);
+	std::string getLine();
 
-	AsyncInput input(l_mutex, l_cond);
-	std::string cmd;
+private:
+	void start();
+	std::string getLine_();
 
-	AsyncIoEmulator emulator(l_mutex, l_cond);
-	server.setContext(&emulator);
+	std::atomic_bool m_ready;
+	std::future<std::string> m_line;
+};
 
-	while (true)
-	{
-		l_cond.wait(lock);
-		cmd = input.getLine();
-		if (!cmd.empty())
-		{
-			execCmd(cmd);
-		}
-		emulator.poll();
-	}
-
-	return 0;
-}
+#endif // ASYNCINPUT_H
