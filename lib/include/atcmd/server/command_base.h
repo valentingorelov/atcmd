@@ -41,6 +41,7 @@ struct CommandBase
 	struct ServerHandle
 	{
 		Server& getServer();
+		void* getContext();
 
 	protected:
 		struct InformationText

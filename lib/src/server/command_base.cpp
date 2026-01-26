@@ -32,6 +32,11 @@ Server& CommandBase::ServerHandle::getServer()
 	return m_server;
 }
 
+void* CommandBase::ServerHandle::getContext()
+{
+	return m_server.getContext();
+}
+
 Command::ServerHandle::ServerHandle(Server& server, bool is_last_command) :
 	m_server{server},
 	m_is_last_command{is_last_command}
