@@ -42,7 +42,7 @@ struct BasicCommandBase : protected Command
 		friend class Server;
 
 	private:
-		BasicServerHandle(const uint8_t* param_start, Server& server, bool is_last_command);
+		BasicServerHandle(const uint8_t* param_start, Server& server, bool is_last_command, CALL_TYPE call_type);
 	};
 
 	struct BasicNumericParameter : public NumericParameter

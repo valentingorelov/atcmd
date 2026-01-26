@@ -154,24 +154,35 @@ Server::Server(PrintCharCallback print_char_callback, void* context) :
 	m_context{context}
 {}
 
-BasicCommandBase::BasicServerHandle Server::getBasicHandle(const uint8_t* param_start, bool is_last_command)
+BasicCommandBase::BasicServerHandle Server::getBasicHandle(
+		const uint8_t* param_start,
+		bool is_last_command,
+		BasicCommandBase::BasicServerHandle::CALL_TYPE call_type)
 {
-	return BasicCommandBase::BasicServerHandle(param_start, *this, is_last_command);
+	return BasicCommandBase::BasicServerHandle(param_start, *this, is_last_command, call_type);
 }
 
-ExtendedCommandBase::ReadServerHandle Server::getReadHandle(bool is_last_command)
+ExtendedCommandBase::ReadServerHandle Server::getReadHandle(
+		bool is_last_command,
+		ExtendedCommandBase::ReadServerHandle::CALL_TYPE call_type)
 {
-	return ExtendedCommandBase::ReadServerHandle(*this, is_last_command);
+	return ExtendedCommandBase::ReadServerHandle(*this, is_last_command, call_type);
 }
 
-ExtendedCommandBase::WriteServerHandle Server::getWriteHandle(const uint8_t* param_start, bool is_last_command)
+ExtendedCommandBase::WriteServerHandle Server::getWriteHandle(
+		const uint8_t* param_start,
+		bool is_last_command,
+		ExtendedCommandBase::ReadServerHandle::CALL_TYPE call_type)
 {
-	return ExtendedCommandBase::WriteServerHandle(param_start, *this, is_last_command);
+	return ExtendedCommandBase::WriteServerHandle(param_start, *this, is_last_command, call_type);
 }
 
 ExtendedCommandBase::TestServerHandle Server::getTestHandle(bool is_last_command)
 {
-	return ExtendedCommandBase::TestServerHandle(*this, is_last_command);
+	return ExtendedCommandBase::TestServerHandle(
+				*this,
+				is_last_command,
+				ExtendedCommandBase::TestServerHandle::CALL_TYPE::REQUEST);
 }
 
 } /* namespace atcmd::server::detail */

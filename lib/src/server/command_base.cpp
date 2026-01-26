@@ -32,14 +32,20 @@ Server& CommandBase::ServerHandle::getServer()
 	return m_server;
 }
 
+CommandBase::ServerHandle::CALL_TYPE CommandBase::ServerHandle::getCallType() const
+{
+	return m_call_type;
+}
+
 void* CommandBase::ServerHandle::getContext()
 {
 	return m_server.getContext();
 }
 
-Command::ServerHandle::ServerHandle(Server& server, bool is_last_command) :
+Command::ServerHandle::ServerHandle(Server& server, bool is_last_command, CALL_TYPE call_type) :
 	m_server{server},
-	m_is_last_command{is_last_command}
+	m_is_last_command{is_last_command},
+	m_call_type{call_type}
 {}
 
 CommandBase::ServerHandle::InformationText CommandBase::ServerHandle::makeInformationText()

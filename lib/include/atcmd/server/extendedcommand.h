@@ -206,7 +206,7 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 			PrintCharCallback m_print_char_callback;
 		};
 
-		TestServerHandle(Server& server, bool is_last_command);
+		TestServerHandle(Server& server, bool is_last_command, CALL_TYPE call_type);
 	};
 
 	struct WriteServerHandle :
@@ -217,7 +217,7 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 		friend struct ExtendedCommandBase;
 
 	private:
-		WriteServerHandle(const uint8_t* param_start, Server& server, bool is_last_command);
+		WriteServerHandle(const uint8_t* param_start, Server& server, bool is_last_command, CALL_TYPE call_type);
 	};
 
 	class ReadServerHandle : public TestServerHandle
@@ -505,7 +505,7 @@ struct ExtendedCommandBase : public ExtendedCommandBase1
 			printHexadecimalStringParameter(const uint8_t* data, uint16_t size) & = delete;
 		};
 
-		ReadServerHandle(detail::Server& server, bool is_last_command);
+		ReadServerHandle(detail::Server& server, bool is_last_command, CALL_TYPE call_type);
 
 	public:
 		ParameterInformationText makeParameterInformationText(const char* name, bool is_result_code = false);

@@ -49,6 +49,38 @@ struct Server : public detail::ServerCmdline<Settings>
 		(this->*m_state)(ch);
 	}
 
+	template<concepts::BasicCommand Cmd>
+	void onBasicCommandExecUpdate()
+	{
+		static constexpr uint16_t cmd_id =
+				Base::getBasicCmdOffset() + 1 + Settings::BasicCommands::template getCommandPosition<Cmd>();
+		continueCmdExec(cmd_id);
+	}
+
+	template<concepts::AmpersandCommand Cmd>
+	void onAmpersandCommandExecUpdate()
+	{
+		static constexpr uint16_t cmd_id =
+				Base::getAmpersandCmdOffset() + Settings::AmpersandCommands::template getCommandPosition<Cmd>();
+		continueCmdExec(cmd_id);
+	}
+
+	template<concepts::ExtendedCommand Cmd>
+	void onExtendedCommandReadUpdate()
+	{
+		static constexpr uint16_t cmd_id =
+				Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::READ);
+		continueCmdExec(cmd_id);
+	}
+
+	template<concepts::ExtendedCommand Cmd>
+	void onExtendedCommandWriteUpdate()
+	{
+		static constexpr uint16_t cmd_id =
+				Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::WRITE);
+		continueCmdExec(cmd_id);
+	}
+
 private:
 	using Base = detail::ServerCmdline<Settings>;
 
@@ -986,6 +1018,18 @@ private:
 	void continueCmdExec()
 	{
 		if (Base::continueCmdExec())
+		{
+			m_state = &Server::stateA;
+		}
+	}
+
+	void continueCmdExec(uint16_t cmd_id)
+	{
+		if (m_state != &Server::stateExecuting)
+		{
+			return;
+		}
+		if (Base::continueCmdExec(cmd_id))
 		{
 			m_state = &Server::stateA;
 		}

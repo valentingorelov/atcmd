@@ -49,14 +49,14 @@ ExtendedCommandBase::TestServerHandle::ExtendedInformationText::~ExtendedInforma
 	m_server.setPrintCharCallback(m_print_char_callback);
 }
 
-ExtendedCommandBase::TestServerHandle::TestServerHandle(Server& server, bool is_last_command) :
-	ServerHandle(server, is_last_command)
+ExtendedCommandBase::TestServerHandle::TestServerHandle(Server& server, bool is_last_command, CALL_TYPE call_type) :
+	ServerHandle(server, is_last_command, call_type)
 {
 
 }
 
-ExtendedCommandBase::WriteServerHandle::WriteServerHandle(const uint8_t* param_start, Server& server, bool is_last_command) :
-	TestServerHandle(server, is_last_command),
+ExtendedCommandBase::WriteServerHandle::WriteServerHandle(const uint8_t* param_start, Server& server, bool is_last_command, CALL_TYPE call_type) :
+	TestServerHandle(server, is_last_command, call_type),
 	ParamServerHandle(param_start)
 {}
 
@@ -143,8 +143,8 @@ void ExtendedCommandBase::ReadServerHandle::ParameterInformationTextSecond::prin
 	m_server.printHexadecimalString(data, size);
 }
 
-ExtendedCommandBase::ReadServerHandle::ReadServerHandle(Server& server, bool is_last_command) :
-	TestServerHandle(server, is_last_command)
+ExtendedCommandBase::ReadServerHandle::ReadServerHandle(Server& server, bool is_last_command, CALL_TYPE call_type) :
+	TestServerHandle(server, is_last_command, call_type)
 {}
 
 ExtendedCommandBase::ReadServerHandle::ParameterInformationText

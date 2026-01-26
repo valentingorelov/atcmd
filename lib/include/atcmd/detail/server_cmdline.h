@@ -32,6 +32,41 @@
 
 namespace atcmd::server {
 
+namespace detail {
+
+template<concepts::Command...>
+struct CmdPosCalculator;
+
+template<concepts::Command Cmd>
+struct CmdPosCalculator<Cmd>
+{
+	static_assert(false, "Unknown command");
+};
+
+template<concepts::Command Cmd, concepts::Command... Cmds>
+struct CmdPosCalculator<Cmd, Cmd, Cmds...>
+{
+	static constexpr uint16_t pos = 0;
+};
+
+template<concepts::Command Cmd, concepts::Command Cmd0, concepts::Command... Cmds>
+struct CmdPosCalculator<Cmd, Cmd0, Cmds...>
+{
+	static constexpr uint16_t pos = 1 + CmdPosCalculator<Cmd, Cmds...>::pos;
+};
+
+template<concepts::Command... Cmds>
+struct CommandList
+{
+	template<concepts::Command Cmd>
+	static consteval uint16_t getCommandPosition()
+	{
+		return CmdPosCalculator<Cmd, Cmds...>::pos;
+	}
+};
+
+} /* namespace detail */
+
 template<class... Cmds>
 struct AmpersandCommandList;
 
@@ -42,7 +77,7 @@ struct AmpersandCommandList<>
 };
 
 template<concepts::AmpersandCommand... Cmds>
-struct AmpersandCommandList<Cmds...>
+struct AmpersandCommandList<Cmds...> : public detail::CommandList<Cmds...>
 {
 	static constexpr inline std::size_t size = sizeof...(Cmds);
 	static constexpr inline detail::BasicCmdDef m_cmd_defs[] = {detail::BasicCmdDef::build<Cmds>()...};
@@ -77,7 +112,7 @@ struct BasicCommandList : public AmpersandCommandList<Cmds...>
 {};
 
 template<concepts::ExtendedCommand... Cmds>
-struct ExtendedCommandList
+struct ExtendedCommandList : public detail::CommandList<Cmds...>
 {
 	static constexpr inline std::size_t size = sizeof...(Cmds);
 	static constexpr inline detail::ExtCmdDef m_ext_cmd_defs[] = {detail::ExtCmdDef::build<Cmds>()...};
@@ -282,25 +317,29 @@ protected:
 		while (m_cmdline_exec_index != m_cmdline_parse_ok_index)
 		{
 			uint16_t cmd_id = getCurrentCmdId();
+			Command::ServerHandle::CALL_TYPE call_type =
+					m_last_result_code == RESULT_CODE::ASYNC ?
+						BasicCommandBase::BasicServerHandle::CALL_TYPE::RESPONSE :
+						BasicCommandBase::BasicServerHandle::CALL_TYPE::REQUEST;
 			if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
 			{
 				if (cmd_id >= getBasicCmdOffset())
 				{
 					uint16_t cmd_index = cmd_id - getBasicCmdOffset();
-					execBasicCmd(cmd_index);
+					execBasicCmd(cmd_index, call_type);
 				}
 				else
 				{
 					uint16_t cmd_index = cmd_id >> 2;
 					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
-					execExtendedCmd(cmd_index, cmd_type);
+					execExtendedCmd(cmd_index, cmd_type, call_type);
 				}
 			}
 			else
 			{
 				uint16_t cmd_index = cmd_id >> 2;
 				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
-				execExtendedCmd(cmd_index, cmd_type);
+				execExtendedCmd(cmd_index, cmd_type, call_type);
 			}
 
 			if (m_last_result_code == RESULT_CODE::ERROR)
@@ -319,6 +358,30 @@ protected:
 		}
 		printResultCode(m_last_result_code);
 		return true;
+	}
+
+	bool continueCmdExec(uint16_t cmd_id)
+	{
+		if (cmd_id != getCurrentCmdId())
+		{
+			return false;
+		}
+		return continueCmdExec();
+	}
+
+	static consteval uint16_t getBasicCmdOffset()
+	{
+		return Settings::ExtendedCommands::size << 2;
+	}
+
+	static consteval uint16_t getAmpersandCmdOffset()
+	{
+		return getBasicCmdOffset() + 1 + Settings::BasicCommands::size;
+	}
+
+	static consteval uint16_t getExtCmdId(uint16_t cmd_index, CMD_TYPE cmd_type)
+	{
+		return (cmd_index << 2) | static_cast<uint16_t>(cmd_type);
 	}
 
 	// Parameter parsing
@@ -343,11 +406,6 @@ protected:
 	};
 
 private:
-	static consteval uint16_t getBasicCmdOffset()
-	{
-		return Settings::ExtendedCommands::size << 2;
-	}
-
 	bool addCmd(uint16_t vl)
 	{
 		if (getCmdlineBufSz() < sizeof(uint16_t))
@@ -400,7 +458,7 @@ private:
 		m_cmdline_parse_index += sizeof(uint16_t);
 	}
 
-	void execBasicCmd(uint16_t cmd_index)
+	void execBasicCmd(uint16_t cmd_index, Command::ServerHandle::CALL_TYPE call_type)
 	{
 		if (cmd_index == 0)
 		{
@@ -481,7 +539,7 @@ private:
 		}
 		bool is_last = m_cmdline_parse_index == next_exec_index;
 
-		m_last_result_code = cmd_def->exec_method(getBasicHandle(param_start, is_last));
+		m_last_result_code = cmd_def->exec_method(getBasicHandle(param_start, is_last, call_type));
 
 		if (m_last_result_code != RESULT_CODE::ASYNC)
 		{
@@ -490,7 +548,7 @@ private:
 		}
 	}
 
-	void execExtendedCmd(uint16_t cmd_index, CMD_TYPE cmd_type)
+	void execExtendedCmd(uint16_t cmd_index, CMD_TYPE cmd_type, Command::ServerHandle::CALL_TYPE call_type)
 	{
 		const detail::ExtCmdDef& cmd_def = Settings::ExtendedCommands::m_ext_cmd_defs[cmd_index];
 
@@ -519,10 +577,10 @@ private:
 		bool is_last = m_cmdline_parse_index == next_exec_index;
 		switch (cmd_type) {
 		case CMD_TYPE::READ:
-			m_last_result_code = cmd_def.getReadMethod()(getReadHandle(is_last));
+			m_last_result_code = cmd_def.getReadMethod()(getReadHandle(is_last, call_type));
 			break;
 		case CMD_TYPE::WRITE:
-			m_last_result_code = cmd_def.getWriteMethod()(getWriteHandle(&m_cmdline[m_cmdline_exec_index + sizeof(uint16_t)], is_last));
+			m_last_result_code = cmd_def.getWriteMethod()(getWriteHandle(&m_cmdline[m_cmdline_exec_index + sizeof(uint16_t)], is_last, call_type));
 			break;
 		case CMD_TYPE::TEST:
 			for (detail::ExtendedCommandBase::TestMethod method = cmd_def.getTestMethod(); method != nullptr;)

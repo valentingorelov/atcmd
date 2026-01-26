@@ -40,7 +40,15 @@ struct CommandBase
 {
 	struct ServerHandle
 	{
+		enum class CALL_TYPE
+		{
+			REQUEST,
+			ABORT,
+			RESPONSE
+		};
+
 		Server& getServer();
+		CALL_TYPE getCallType() const;
 		void* getContext();
 
 	protected:
@@ -57,13 +65,16 @@ struct CommandBase
 			bool m_is_result_code;
 		};
 
-		ServerHandle(Server& server, bool is_last_command);
+		ServerHandle(Server& server, bool is_last_command, CALL_TYPE call_type);
 
 		Server& m_server;
 		bool m_is_last_command;
 
 	public:
 		InformationText makeInformationText();
+
+	private:
+		CALL_TYPE m_call_type;
 	};
 
 	struct ParamServerHandle

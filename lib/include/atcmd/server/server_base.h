@@ -69,10 +69,18 @@ public:
 protected:
 	Server(PrintCharCallback print_char_callback, void* context);
 
-	BasicCommandBase::BasicServerHandle getBasicHandle(const uint8_t* param_start, bool is_last_command);
+	BasicCommandBase::BasicServerHandle getBasicHandle(
+			const uint8_t* param_start,
+			bool is_last_command,
+			CommandBase::ServerHandle::CALL_TYPE call_type);
 
-	ExtendedCommandBase::ReadServerHandle getReadHandle(bool is_last_command);
-	ExtendedCommandBase::WriteServerHandle getWriteHandle(const uint8_t* param_start, bool is_last_command);
+	ExtendedCommandBase::ReadServerHandle getReadHandle(
+			bool is_last_command,
+			ExtendedCommandBase::ReadServerHandle::CALL_TYPE call_type);
+	ExtendedCommandBase::WriteServerHandle getWriteHandle(
+			const uint8_t* param_start,
+			bool is_last_command,
+			CommandBase::ServerHandle::CALL_TYPE call_type);
 	ExtendedCommandBase::TestServerHandle getTestHandle(bool is_last_command);
 
 private:

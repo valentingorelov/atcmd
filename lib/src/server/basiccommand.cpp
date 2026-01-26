@@ -26,8 +26,8 @@
 
 namespace atcmd::server::detail {
 
-BasicCommandBase::BasicServerHandle::BasicServerHandle(const uint8_t* param_start, Server& server, bool is_last_command) :
-	ServerHandle(server, is_last_command),
+BasicCommandBase::BasicServerHandle::BasicServerHandle(const uint8_t* param_start, Server& server, bool is_last_command, CALL_TYPE call_type) :
+	ServerHandle(server, is_last_command, call_type),
 	ParamServerHandle(param_start)
 {}
 
