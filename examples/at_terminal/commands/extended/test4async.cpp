@@ -37,6 +37,9 @@ atcmd::RESULT_CODE Test4async::Definition::onWrite(WriteServerHandle server_hand
 		l_write_index = 0;
 		io->write(0, parameters.getNumeric<Param0>());
 		return atcmd::RESULT_CODE::ASYNC;
+	case WriteServerHandle::CALL_TYPE::ABORT:
+		io->writeTerminate();
+		return atcmd::RESULT_CODE::ERROR;
 	case WriteServerHandle::CALL_TYPE::RESPONSE:
 		if (l_write_index == 2)
 		{
@@ -69,6 +72,8 @@ atcmd::RESULT_CODE Test4async::Definition::onRead(ReadServerHandle server_handle
 	switch (server_handle.getCallType()) {
 	case WriteServerHandle::CALL_TYPE::REQUEST:
 		io->read();
+		return atcmd::RESULT_CODE::ASYNC;
+	case WriteServerHandle::CALL_TYPE::ABORT:
 		return atcmd::RESULT_CODE::ASYNC;
 	case WriteServerHandle::CALL_TYPE::RESPONSE:
 	{

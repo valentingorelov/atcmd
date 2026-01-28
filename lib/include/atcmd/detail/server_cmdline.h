@@ -369,6 +369,38 @@ protected:
 		return continueCmdExec();
 	}
 
+	bool abortCmdExec()
+	{
+		uint16_t cmd_id = getCurrentCmdId();
+		if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
+		{
+			if (cmd_id >= getBasicCmdOffset())
+			{
+				uint16_t cmd_index = cmd_id - getBasicCmdOffset();
+				execBasicCmd(cmd_index, Command::ServerHandle::CALL_TYPE::ABORT);
+			}
+			else
+			{
+				uint16_t cmd_index = cmd_id >> 2;
+				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
+				execExtendedCmd(cmd_index, cmd_type, Command::ServerHandle::CALL_TYPE::ABORT);
+			}
+		}
+		else
+		{
+			uint16_t cmd_index = cmd_id >> 2;
+			CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
+			execExtendedCmd(cmd_index, cmd_type, Command::ServerHandle::CALL_TYPE::ABORT);
+		}
+
+		if (m_last_result_code == RESULT_CODE::ASYNC)
+		{
+			return false;
+		}
+		printResultCode(m_last_result_code);
+		return true;
+	}
+
 	static consteval uint16_t getBasicCmdOffset()
 	{
 		return Settings::ExtendedCommands::size << 2;
@@ -541,7 +573,7 @@ private:
 
 		m_last_result_code = cmd_def->exec_method(getBasicHandle(param_start, is_last, call_type));
 
-		if (m_last_result_code != RESULT_CODE::ASYNC)
+		if ((m_last_result_code != RESULT_CODE::ASYNC) && (call_type != Command::ServerHandle::CALL_TYPE::ABORT))
 		{
 			// Go to the next command
 			m_cmdline_exec_index = next_exec_index;
@@ -600,7 +632,7 @@ private:
 			break;
 		}
 
-		if (m_last_result_code != RESULT_CODE::ASYNC)
+		if ((m_last_result_code != RESULT_CODE::ASYNC) && (call_type != Command::ServerHandle::CALL_TYPE::ABORT))
 		{
 			// Go to the next command
 			m_cmdline_exec_index = next_exec_index;

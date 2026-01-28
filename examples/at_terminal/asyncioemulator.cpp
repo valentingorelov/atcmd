@@ -93,6 +93,7 @@ void AsyncIoEmulator::write_(uint_fast8_t index, uint32_t data)
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		if (m_write_terminated)
 		{
+			m_write_ongoing = false;
 			return;
 		}
 	}

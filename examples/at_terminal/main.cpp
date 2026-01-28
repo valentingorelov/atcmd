@@ -32,9 +32,8 @@ void execCmd(const std::string& cmd)
 {
 	for (const char& c : cmd)
 	{
-		server.feed(c);
+		server.feed(c, true);
 	}
-	server.feed('\r');
 }
 
 int main()

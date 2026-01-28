@@ -53,6 +53,7 @@ std::string AsyncInput::getLine_()
 {
 	std::string cmd;
 	std::getline(std::cin, cmd);
+	cmd += '\r';
 
 	std::lock_guard lock(m_mutex);
 	m_ready = true;

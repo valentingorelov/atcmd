@@ -40,13 +40,13 @@ struct Server : public detail::ServerCmdline<Settings>
 		m_state{&Server::stateA}
 	{}
 
-	void feed(char ch)
+	void feed(char ch, bool abortable = false)
 	{
 		if (m_state != &Server::stateExtendedParamString)
 		{
 			ch = atcmd::detail::Characters::toUpper(ch);
 		}
-		(this->*m_state)(ch);
+		(this->*m_state)(ch, abortable);
 	}
 
 	template<concepts::BasicCommand Cmd>
@@ -95,6 +95,7 @@ private:
 	using Base::finalizeHexString;
 	using Base::finalizeBasicCmd;
 	using Base::finalizeExtCmd;
+	using Base::abortCmdExec;
 
 	using CMD_TYPE = Base::CMD_TYPE;
 	using Base::m_param_value_num;
@@ -105,9 +106,9 @@ private:
 	using Base::getCommunicationParameters;
 
 	// State machine states
-	using State = void (Server::*)(char);
+	using State = void (Server::*)(char, bool);
 
-	void stateA(char ch)
+	void stateA(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -119,7 +120,7 @@ private:
 		}
 	}
 
-	void stateT(char ch)
+	void stateT(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -140,8 +141,10 @@ private:
 		}
 	}
 
-	void stateBody(char ch)
+	void stateBody(char ch, bool abortable = false)
 	{
+		(void)abortable;
+
 		if (ch == ' ')
 		{
 			return;
@@ -220,7 +223,7 @@ private:
 		}
 	}
 
-	void stateS(char ch)
+	void stateS(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -271,7 +274,7 @@ private:
 		}
 	}
 
-	void stateSSet(char ch)
+	void stateSSet(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -294,11 +297,11 @@ private:
 				finalizeBasicCmd();
 				m_state = &Server::stateBody;
 			}
-			(this->*m_state)(ch);
+			(this->*m_state)(ch, false);
 		}
 	}
 
-	void stateAmpersand(char ch)
+	void stateAmpersand(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -332,7 +335,7 @@ private:
 		}
 	}
 
-	void stateBasicParameter(char ch)
+	void stateBasicParameter(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -372,11 +375,11 @@ private:
 				// Range validation failure
 				m_state = &Server::stateError;
 			}
-			(this->*m_state)(ch);
+			(this->*m_state)(ch, false);
 		}
 	}
 
-	void stateExtended(char ch)
+	void stateExtended(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -466,7 +469,7 @@ private:
 		}
 	}
 
-	void stateExtendedEq(char ch)
+	void stateExtendedEq(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -520,14 +523,14 @@ private:
 					{
 						m_param_index = 0;
 						setupParameterParser();
-						(this->*m_state)(ch);
+						(this->*m_state)(ch, false);
 					}
 				}
 			}
 		}
 	}
 
-	void stateExtendedReadTest(char ch)
+	void stateExtendedReadTest(char ch, bool /*abortable*/)
 	{
 		if (ch == ' ')
 		{
@@ -608,7 +611,7 @@ private:
 		}
 	}
 
-	void stateExtendedParamNumDecStart(char ch)
+	void stateExtendedParamNumDecStart(char ch, bool /*abortable*/)
 	{
 		if (processDefaultParameter(ch, &Server::addDefaultNumericParameter))
 		{
@@ -619,7 +622,7 @@ private:
 		stateExtendedParamNumDec(ch);
 	}
 
-	void stateExtendedParamNumHexStart(char ch)
+	void stateExtendedParamNumHexStart(char ch, bool /*abortable*/)
 	{
 		if (processDefaultParameter(ch, &Server::addDefaultNumericParameter))
 		{
@@ -630,7 +633,7 @@ private:
 		stateExtendedParamNumHex(ch);
 	}
 
-	void stateExtendedParamNumBinStart(char ch)
+	void stateExtendedParamNumBinStart(char ch, bool /*abortable*/)
 	{
 		if (processDefaultParameter(ch, &Server::addDefaultNumericParameter))
 		{
@@ -641,8 +644,10 @@ private:
 		stateExtendedParamNumBin(ch);
 	}
 
-	void stateExtendedParamNumDec(char ch)
+	void stateExtendedParamNumDec(char ch, bool abortable = false)
 	{
+		(void)abortable;
+
 		if (processNumericParameterEnd_(ch))
 		{
 			return;
@@ -655,8 +660,10 @@ private:
 		}
 	}
 
-	void stateExtendedParamNumHex(char ch)
+	void stateExtendedParamNumHex(char ch, bool abortable = false)
 	{
+		(void)abortable;
+
 		if (processNumericParameterEnd_(ch))
 		{
 			return;
@@ -683,8 +690,10 @@ private:
 		}
 	}
 
-	void stateExtendedParamNumBin(char ch)
+	void stateExtendedParamNumBin(char ch, bool abortable = false)
 	{
+		(void)abortable;
+
 		if (processNumericParameterEnd_(ch))
 		{
 			return;
@@ -710,7 +719,7 @@ private:
 		}
 	}
 
-	void stateExtendedParamStringStart(char ch)
+	void stateExtendedParamStringStart(char ch, bool /*abortable*/)
 	{
 		if (processDefaultParameter(ch, &Server::addDefaultStringParameter))
 		{
@@ -731,7 +740,7 @@ private:
 		}
 	}
 
-	void stateExtendedParamHexStringStart(char ch)
+	void stateExtendedParamHexStringStart(char ch, bool /*abortable*/)
 	{
 		if (processDefaultParameter(ch, &Server::addDefaultHexStringParameter))
 		{
@@ -753,7 +762,7 @@ private:
 		}
 	}
 
-	void stateExtendedParamString(char ch)
+	void stateExtendedParamString(char ch, bool /*abortable*/)
 	{
 		if (ch == '"')
 		{
@@ -773,7 +782,7 @@ private:
 		}
 	}
 
-	void stateExtendedParamHexString(char ch)
+	void stateExtendedParamHexString(char ch, bool /*abortable*/)
 	{
 		if ((ch == ' ') || (ch == '-'))
 		{
@@ -826,7 +835,7 @@ private:
 		m_param_hex_string.second = !m_param_hex_string.second;
 	}
 
-	void stateExtendedParamStringEnd(char ch)
+	void stateExtendedParamStringEnd(char ch, bool /*abortable*/)
 	{
 		const detail::ExtCmdDef& cmd_def = getCmdDef();
 		if (ch == ',')
@@ -872,17 +881,22 @@ private:
 		}
 	}
 
-	void stateError(char ch)
+	void stateError(char ch, bool abortable = false)
 	{
+		(void)abortable;
 		if (ch == getCommunicationParameters().getCmdLineTerminationChar())
 		{
 			startCmdExec(true);
 		}
 	}
 
-	void stateExecuting(char /*ch*/)
+	void stateExecuting(char /*ch*/, bool abortable)
 	{
-		// TODO abort processing
+		if (!abortable || !abortCmdExec())
+		{
+			return;
+		}
+		m_state = &Server::stateA;
 	}
 
 	const detail::ExtCmdDef& getCmdDef() const
