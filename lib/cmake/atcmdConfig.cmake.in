@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+# Ensure the targets file (installed) is loaded
+include("${CMAKE_CURRENT_LIST_DIR}/atcmdTargets.cmake")

@@ -90,7 +90,7 @@ make
 
 ### Requirements
 - C++23 compatible compiler (GCC 13+, Clang 16+, MSVC 19.30+)
-- CMake 3.5+
+- CMake 3.28+
 
 ## License
 This software is provided under the MIT License. See LICENSE.txt for the complete license text.

@@ -1,13 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-
-# Terminal example project
-project(at_terminal LANGUAGES CXX)
-
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Example sources
 set(EXAMPLE_SOURCES
     main.cpp
@@ -30,12 +20,21 @@ set(EXAMPLE_SOURCES
 # Create the executable
 add_executable(at_terminal ${EXAMPLE_SOURCES})
 
+# Set target properties
+set_target_properties(at_terminal PROPERTIES CXX_EXTENSIONS OFF)
+
+# Stricter compiller warnings
+target_compile_options(at_terminal
+    PRIVATE
+      $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall;-Wextra;-Wpedantic>
+      $<$<CXX_COMPILER_ID:MSVC>:/W4>
+)
+
 # Link with the library
-target_link_libraries(at_terminal PRIVATE atcmd)
+target_link_libraries(at_terminal PRIVATE atcmd::atcmd)
 
-# Install target
+# Installation
 include(GNUInstallDirs)
-
 install(TARGETS at_terminal
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
