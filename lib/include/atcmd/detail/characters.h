@@ -26,6 +26,7 @@
 #define ATCMD_CHARACTERS_H
 
 #include <cstdint>
+#include <array>
 #include <assert.h>
 
 #include <atcmd/common.h>
@@ -129,19 +130,26 @@ struct Characters
 
 	static constexpr char decode(uint8_t encoded)
 	{
-		static constexpr char alphabet[] =
-		{
-			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-			'!', '%', '-', '.', '/', ':', '_'
-		};
-		assert(encoded < sizeof(alphabet));
+		assert(encoded < getAlphabetSize());
 		return alphabet[encoded];
 	}
 
 	static void printNumber(uint32_t number, uint8_t base, PrintCharCallback callback, void* context);
 	static void printHexadecimalString(const uint8_t* data, uint16_t size, PrintCharCallback callback, void* context);
+
+	static constexpr uint_fast8_t getAlphabetSize()
+	{
+		return std::size(alphabet);
+	}
+
+private:
+	static inline constexpr char alphabet[] =
+	{
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+		'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'!', '%', '-', '.', '/', ':', '_'
+	};
 };
 
 }

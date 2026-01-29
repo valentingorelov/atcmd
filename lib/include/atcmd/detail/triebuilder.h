@@ -29,7 +29,7 @@
 #include <cstdint>
 #include <assert.h>
 
-#include "characters.h"
+#include <atcmd/detail/characters.h>
 
 namespace atcmd::detail {
 
@@ -46,7 +46,7 @@ private:
 	struct Node
 	{
 		uint8_t ch;
-		Node* children[10];
+		Node* children[Characters::getAlphabetSize()];
 		std::size_t child_count;
 
 		uint16_t leaf_cmd_index;
