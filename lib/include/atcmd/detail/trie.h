@@ -112,12 +112,8 @@ private:
 		}
 
 		m_pos++;
-		for (uint_fast8_t i = 0; i < 3; i++)
+		if ((current() & (1u << 7)))
 		{
-			if ((current() & (1u << 7)) == 0)
-			{
-				break;
-			}
 			m_pos++;
 		}
 		m_pos++;

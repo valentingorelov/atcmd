@@ -128,7 +128,7 @@ private:
 		if (root->leaf_cmd_index != 0)
 		{
 			root->subtree_size_rooted++;
-			if (root->leaf_cmd_index > 0x40)
+			if (root->leaf_cmd_index > 0x80)
 			{
 				root->subtree_size_rooted++;
 			}
