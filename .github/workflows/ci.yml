@@ -1,0 +1,59 @@
+# CI: build + run tests on master pushes, release tags, and PRs to master
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'                # run for release tags like v1.2.3
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch: {}     # manual trigger
+
+jobs:
+  build-and-test:
+    name: Build and test (CMake)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ccache
+          if [ "${{ matrix.compiler }}" = "clang" ]; then sudo apt-get install -y clang; fi
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+             -DATCMD_BUILD_TESTS=ON \
+             -DCMAKE_C_COMPILER=${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }} \
+             -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }}
+
+      - name: Build
+        run: cmake --build build -- -j
+
+      - name: Run tests
+        run: cd build && ctest --output-on-failure --parallel 2
+
+      - name: Upload test logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ github.job }}-${{ github.run_id }}
+          path: build/Testing
