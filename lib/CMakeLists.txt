@@ -100,3 +100,13 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/atcmdConfigVersion.cmake
     DESTINATION ${CONFIG_INSTALL_DIR}
 )
+
+if(ATCMD_COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Turn off optimizations for nicer coverage reports
+    target_compile_options(atcmd PRIVATE -O0 -g --coverage)
+    target_link_options(atcmd PRIVATE --coverage)
+  else()
+    message(FATAL_ERROR "Coverage is only supported with GCC/Clang in this setup.")
+  endif()
+endif()

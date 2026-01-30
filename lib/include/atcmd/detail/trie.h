@@ -30,10 +30,10 @@
 
 namespace atcmd::detail {
 
-template<const char*... names>
-struct Trie
+template<std::size_t N, std::array<const char*, N> names>
+struct TrieBase
 {
-	Trie() : m_pos{0}
+	TrieBase() : m_pos{0}
 	{}
 
 	void reset()
@@ -143,10 +143,13 @@ private:
 
 	std::size_t m_pos;
 
-	static constexpr std::array<const char*, sizeof...(names)> m_names = {names...};
 	static constexpr auto m_trie =
-			TrieBuilder::getTrie<TrieBuilder::getTrieSize(m_names.data(), sizeof...(names))>(m_names.data(), sizeof...(names));
+			TrieBuilder::getTrie<TrieBuilder::getTrieSize(names.data(), names.size())>(names.data(), names.size());
 };
+
+template<const char*... names>
+struct Trie : public TrieBase<sizeof... (names), {names...}>
+{};
 
 } /* namespace atcmd::detail */
 
