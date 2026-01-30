@@ -123,8 +123,8 @@ private:
 	{
 		uint32_t r = 0;
 
-		// First 3 bytes
-		for (uint_fast8_t i = 0; i < 3; i++)
+		// First 2 bytes
+		for (uint_fast8_t i = 0; i < 2; i++)
 		{
 			r |= (current() & 0x7F) << (7 * i);
 			if ((current() & (1u << 7)) == 0)
@@ -135,8 +135,8 @@ private:
 			m_pos++;
 		}
 
-		// Fourth byte
-		r |= current() << 21;
+		// Third byte
+		r |= current() << 14;
 		m_pos++;
 		return r;
 	}

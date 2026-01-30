@@ -134,13 +134,9 @@ private:
 			}
 		}
 
-		// We need 1 to 4 bytes to encode the subtree size
-		assert((root->subtree_size <= 0x1FFFFFFF) && "Subtree is too large");
-		if (root->subtree_size > 0x1FFFFF)
-		{
-			root->subtree_size_rooted += 4;
-		}
-		else if (root->subtree_size > 0x3FFF)
+		// We need 1 to 3 bytes to encode the subtree size
+		assert((root->subtree_size <= 0x3FFFFF) && "Subtree is too large");
+		if (root->subtree_size > 0x3FFF)
 		{
 			root->subtree_size_rooted += 3;
 		}
@@ -198,23 +194,9 @@ private:
 			{
 				*dest |= 1u << 7;
 				dest++;
-				*dest = s & 0x7F;
-				s >>= 7u;
-				if (s != 0)
-				{
-					*dest |= 1u << 7;
-					dest++;
-					*dest = s & 0xFF;
-				}
-				else
-				{
-					dest++;
-				}
+				*dest = s & 0xFF;
 			}
-			else
-			{
-				dest++;
-			}
+			dest++;
 		}
 		else
 		{
