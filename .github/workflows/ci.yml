@@ -51,7 +51,7 @@ jobs:
         run: cmake --build build -- -j
 
       - name: Run tests
-        run: cd build && ctest --output-on-failure --parallel 2
+        run: cd build/tests && ctest --output-on-failure --parallel 2
 
       - name: Upload test logs (on failure)
         if: failure()
