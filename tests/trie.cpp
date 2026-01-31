@@ -27,7 +27,7 @@
 #include <atcmd/detail/trie.h>
 
 constexpr std::size_t NAME_MAX_SIZE = 10;
-constexpr std::size_t NAMES_COUNT = 16383;;
+constexpr std::size_t NAMES_COUNT = 16383;
 
 struct Name
 {
