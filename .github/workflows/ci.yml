@@ -40,10 +40,12 @@ jobs:
           if [ "${{ matrix.compiler }}" = "clang" ]; then sudo apt-get install -y clang; fi
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-             -DATCMD_BUILD_TESTS=ON \
-             -DCMAKE_C_COMPILER=${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }} \
-             -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }}
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release\
+            -DATCMD_BUILD_TESTS=ON \
+            -DCMAKE_C_COMPILER=${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }}
 
       - name: Build
         run: cmake --build build -- -j
