@@ -40,10 +40,17 @@ enable_testing()
 include(GoogleTest)
 gtest_discover_tests(atcmd_tests)
 
+if(ATCMD_BUILD_TESTS)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(atcmd_tests PRIVATE $<$<CXX_COMPILER_ID:Clang>:-fconstexpr-steps=20000000>)
+    target_compile_options(atcmd_tests PRIVATE -fconstexpr-depth=20480)
+  endif()
+endif()
+
 if(ATCMD_COVERAGE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Turn off optimizations for nicer coverage reports
-    target_compile_options(atcmd_tests PRIVATE -O0 -g --coverage -fconstexpr-depth=20480)
+    target_compile_options(atcmd_tests PRIVATE -O0 -g --coverage)
     target_link_options(atcmd_tests PRIVATE --coverage)
   else()
     message(FATAL_ERROR "Coverage is only supported with GCC/Clang in this setup.")

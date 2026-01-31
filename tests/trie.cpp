@@ -133,7 +133,13 @@ TEST(TrieTest, NoFirstChild) {
 	ASSERT_FALSE(m_trie_single.feed('C'));
 }
 
+#ifdef __clang__
+// Clang crashes when this value is high
+constexpr std::size_t LONG_NAME_SIZE = 1000;
+#else
 constexpr std::size_t LONG_NAME_SIZE = 10000;
+#endif
+
 struct LongName
 {
 	char name[LONG_NAME_SIZE + 1];
