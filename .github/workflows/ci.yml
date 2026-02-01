@@ -52,6 +52,9 @@ jobs:
       - name: Build
         run: cmake --build build -- -j
 
+      - name: ccache stats
+        run: ccache -s
+
       - name: Run tests
         run: cd build/tests && ctest --output-on-failure --parallel 2
 
