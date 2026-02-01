@@ -1,0 +1,53 @@
+name: Pages (Doxygen)
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: {}     # manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"            # only one Pages deployment runs at a time
+  cancel-in-progress: true  # if someone pushes again while the deployment is running, the old one is cancelled
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # clones the repository into the runner
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DATCMD_BUILD_DOCUMENTATION=ON
+
+      - name: Build docs
+        run: cmake --build build --target atcmd_doc
+
+      - name: Building the pages website
+        run: |
+          mkdir pages
+          mv docs/index.html pages
+          mkdir pages/doxygen
+          mv build/docs/html/* pages/doxygen
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+
+      - name: Deploy
+        uses: actions/deploy-pages@v4

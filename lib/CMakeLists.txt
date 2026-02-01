@@ -110,3 +110,30 @@ if(ATCMD_COVERAGE)
     message(FATAL_ERROR "Coverage is only supported with GCC/Clang in this setup.")
   endif()
 endif()
+
+option(ATCMD_BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
+if(ATCMD_BUILD_DOCUMENTATION)
+  find_package(Doxygen REQUIRED)
+
+  set(DOXYGEN_OUTPUT_DIR "${CMAKE_BINARY_DIR}/docs")
+
+  set(DOXYGEN_INPUT_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+  )
+
+  # Doxygen expects a space-separated list
+  list(JOIN DOXYGEN_INPUT_DIRS " " DOXYGEN_INPUT_DIRS)
+
+  set(DOXYFILE_IN  "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in")
+  set(DOXYFILE_OUT "${CMAKE_BINARY_DIR}/Doxyfile")
+
+  configure_file("${DOXYFILE_IN}" "${DOXYFILE_OUT}" @ONLY)
+
+  add_custom_target(atcmd_doc ALL
+    COMMAND "${DOXYGEN_EXECUTABLE}" "${DOXYFILE_OUT}"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMENT "Generating API documentation with Doxygen"
+    VERBATIM
+  )
+endif()
