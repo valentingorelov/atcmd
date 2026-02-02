@@ -111,7 +111,6 @@ if(ATCMD_COVERAGE)
   endif()
 endif()
 
-option(ATCMD_BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 if(ATCMD_BUILD_DOCUMENTATION)
   find_package(Doxygen REQUIRED)
 

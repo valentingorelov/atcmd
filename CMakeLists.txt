@@ -8,11 +8,20 @@ project(atcmd
     VERSION 0.0.1
     LANGUAGES CXX)
 
+# Configuration options
+include(CMakeDependentOption)
+option(ATCMD_BUILD_EXAMPLES "Build example applications" OFF)
+option(ATCMD_BUILD_TESTS "Build unit tests" OFF)
+cmake_dependent_option(ATCMD_COVERAGE
+    "Enable coverage flags (GCC/Clang only)"
+    OFF
+    "(NOT ATCMD_BUILD_EXAMPLES) AND ATCMD_BUILD_TESTS"
+    OFF)
+
+option(ATCMD_BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
+
 # Add subdirectories
 add_subdirectory(lib)
-
-# Option to build examples
-option(ATCMD_BUILD_EXAMPLES "Build example applications" OFF)
 
 if(ATCMD_BUILD_EXAMPLES)
     add_subdirectory(examples/at_terminal)
@@ -21,18 +30,12 @@ else()
     message(STATUS "Examples disabled - not building at_terminal")
 endif()
 
-# Option to build tests
-option(ATCMD_BUILD_TESTS "Build unit tests" OFF)
-
 if(ATCMD_BUILD_TESTS)
     add_subdirectory(tests)
     message(STATUS "Building tests")
 else()
     message(STATUS "Tests disabled - not building tests")
 endif()
-
-# Option to produce test coverage info
-option(ATCMD_COVERAGE "Enable coverage flags (GCC/Clang only)" OFF)
 
 if(ATCMD_BUILD_TESTS AND ATCMD_COVERAGE)
     find_program(LCOV_EXEC lcov)
