@@ -59,7 +59,16 @@ if(ATCMD_COVERAGE)
         message(FATAL_ERROR "Coverage is only supported with GCC/Clang in this setup.")
       endif()
 
-      set(LCOV_EXEC ${LCOV_EXEC} --gcov-tool /usr/bin/gcov-14 --ignore-errors mismatch)
+      # Automatically discover the GCC version
+      execute_process(
+        COMMAND ${CMAKE_C_COMPILER} -dumpfullversion -dumpversion
+        OUTPUT_VARIABLE GCC_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      # Take the major version (e.g. "14" from "14.2.0")
+      string(REGEX MATCH "^[0-9]+" GCC_MAJOR "${GCC_VERSION}")
+
+      set(LCOV_EXEC ${LCOV_EXEC} --gcov-tool /usr/bin/gcov-${GCC_MAJOR} --ignore-errors mismatch)
       add_custom_target(atcmd_coverage ALL
           COMMAND ${CMAKE_COMMAND} -E rm -rf coverage coverage.info coverage.filtered.info
           COMMAND ${LCOV_EXEC} --zerocounters --directory .

@@ -12,6 +12,15 @@ on:
       - master
   workflow_dispatch: {}     # manual trigger
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"            # only one action at a time
+  cancel-in-progress: true  # if someone pushes again while the deployment is running, the old one is cancelled
+
 jobs:
   build-and-test:
     name: Build and test (CMake)
@@ -23,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # clones the repository into the runner
 
       - name: Cache ccache
         uses: actions/cache@v4
@@ -36,14 +45,16 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake ccache
+          sudo apt-get install -y build-essential cmake ccache doxygen graphviz lcov
           if [ "${{ matrix.compiler }}" = "clang" ]; then sudo apt-get install -y clang; fi
 
       - name: Configure
         run: |
           cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=Release\
+            -DCMAKE_BUILD_TYPE=Release \
+            -DATCMD_BUILD_DOCUMENTATION=${{ matrix.compiler == 'gcc' && 'ON' || 'OFF' }} \
             -DATCMD_BUILD_TESTS=ON \
+            -DATCMD_COVERAGE=${{ matrix.compiler == 'gcc' && 'ON' || 'OFF' }} \
             -DCMAKE_C_COMPILER=${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }} \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
@@ -64,3 +75,27 @@ jobs:
         with:
           name: test-logs-${{ github.job }}-${{ github.run_id }}
           path: build/Testing
+
+      - name: Building the pages website
+        if: matrix.compiler == 'gcc'
+        run: |
+          mkdir pages
+          mv docs/index.html pages
+          mkdir pages/doxygen
+          mv build/docs/html/* pages/doxygen
+          mkdir pages/lcov
+          mv build/tests/coverage/* pages/lcov
+
+      - name: Setup Pages
+        if: matrix.compiler == 'gcc'
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        if: matrix.compiler == 'gcc'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+
+      - name: Deploy
+        if: matrix.compiler == 'gcc'
+        uses: actions/deploy-pages@v4
