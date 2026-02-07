@@ -32,9 +32,34 @@
 
 namespace atcmd::server {
 
-template<concepts::ServerSettings Settings>
-struct Server : public detail::ServerCmdline<Settings>
+namespace detail
 {
+
+template<std::size_t ext_cmd_size, class ExtendedCommands>
+struct ServerTrieHolder;
+
+template<class ExtendedCommands>
+struct ServerTrieHolder<0, ExtendedCommands>
+{
+	using m_trie = void;
+};
+
+template<std::size_t ext_cmd_size, class ExtendedCommands>
+struct ServerTrieHolder
+{
+	typename ExtendedCommands::Trie m_trie;
+};
+
+} /* namespace detail */
+
+template<concepts::ServerSettings Settings>
+class Server :
+		public detail::ServerCmdline<Settings>,
+		public detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>
+{
+	using detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>::m_trie;
+
+public:
 	Server(PrintCharCallback print_char_callback, void* context = nullptr) :
 		detail::ServerCmdline<Settings>(print_char_callback, context),
 		m_state{&Server::stateA}
@@ -42,7 +67,14 @@ struct Server : public detail::ServerCmdline<Settings>
 
 	void feed(char ch, bool abortable = false)
 	{
-		if (m_state != &Server::stateExtendedParamString)
+		if constexpr (Settings::ExtendedCommands::size != 0)
+		{
+			if (m_state != &Server::stateExtendedParamString)
+			{
+				ch = atcmd::detail::Characters::toUpper(ch);
+			}
+		}
+		else
 		{
 			ch = atcmd::detail::Characters::toUpper(ch);
 		}
@@ -68,17 +100,23 @@ struct Server : public detail::ServerCmdline<Settings>
 	template<concepts::ExtendedCommand Cmd>
 	void onExtendedCommandReadUpdate()
 	{
-		static constexpr uint16_t cmd_id =
-				Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::READ);
-		continueCmdExec(cmd_id);
+		if constexpr (Settings::ExtendedCommands::size != 0)
+		{
+			static constexpr uint16_t cmd_id =
+					Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::READ);
+			continueCmdExec(cmd_id);
+		}
 	}
 
 	template<concepts::ExtendedCommand Cmd>
 	void onExtendedCommandWriteUpdate()
 	{
-		static constexpr uint16_t cmd_id =
-				Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::WRITE);
-		continueCmdExec(cmd_id);
+		if constexpr (Settings::ExtendedCommands::size != 0)
+		{
+			static constexpr uint16_t cmd_id =
+					Base::getExtCmdId(Settings::ExtendedCommands::template getCommandPosition<Cmd>(), CMD_TYPE::WRITE);
+			continueCmdExec(cmd_id);
+		}
 	}
 
 private:
@@ -129,7 +167,10 @@ private:
 		switch (ch) {
 		case 'T':
 			Base::resetCmdline();
-			m_trie.reset();
+			if constexpr (Settings::ExtendedCommands::size != 0)
+			{
+				m_trie.reset();
+			}
 			m_state = &Server::stateBody;
 			break;
 		case '/':
@@ -209,7 +250,14 @@ private:
 			}
 			else if (ch == '+')
 			{
-				m_state = &Server::stateExtended;
+				if constexpr (Settings::ExtendedCommands::size != 0)
+				{
+					m_state = &Server::stateExtended;
+				}
+				else
+				{
+					m_state = &Server::stateError;
+				}
 			}
 			else if (ch == getCommunicationParameters().getCmdLineTerminationChar())
 			{
@@ -351,11 +399,15 @@ private:
 		}
 		else
 		{
+			// TODO optimize for fixed basic and ampersand command index offsets
 			const detail::BasicCmdDef* cmd_def;
 			static constexpr uint8_t basic_cmd_count = 1 + Settings::BasicCommands::size;
 			if (m_basic_cmd_index >= basic_cmd_count)
 			{
-				cmd_def = &Settings::AmpersandCommands::m_cmd_defs[m_basic_cmd_index - basic_cmd_count];
+				if constexpr (Settings::AmpersandCommands::size != 0)
+				{
+					cmd_def = &Settings::AmpersandCommands::m_cmd_defs[m_basic_cmd_index - basic_cmd_count];
+				}
 			}
 			else
 			{
@@ -1050,9 +1102,6 @@ private:
 	}
 
 	State m_state;
-
-	// Extended Syntax Command parsing
-	typename Settings::ExtendedCommands::Trie m_trie;
 };
 
 } /* namespace atcmdlib::server */

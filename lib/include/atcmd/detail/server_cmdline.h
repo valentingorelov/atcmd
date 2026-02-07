@@ -111,8 +111,17 @@ template<concepts::BasicCommand... Cmds>
 struct BasicCommandList : public AmpersandCommandList<Cmds...>
 {};
 
+template<class... Cmds>
+struct ExtendedCommandList;
+
+template<>
+struct ExtendedCommandList<>
+{
+	static constexpr inline std::size_t size = 0;
+};
+
 template<concepts::ExtendedCommand... Cmds>
-struct ExtendedCommandList : public detail::CommandList<Cmds...>
+struct ExtendedCommandList<Cmds...> : public detail::CommandList<Cmds...>
 {
 	static constexpr inline std::size_t size = sizeof...(Cmds);
 	static constexpr inline detail::ExtCmdDef m_ext_cmd_defs[] = {detail::ExtCmdDef::build<Cmds>()...};
@@ -323,23 +332,34 @@ protected:
 						BasicCommandBase::BasicServerHandle::CALL_TYPE::REQUEST;
 			if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
 			{
-				if (cmd_id >= getBasicCmdOffset())
+				if constexpr (Settings::ExtendedCommands::size != 0)
+				{
+					if (cmd_id >= getBasicCmdOffset())
+					{
+						uint16_t cmd_index = cmd_id - getBasicCmdOffset();
+						execBasicCmd(cmd_index, call_type);
+					}
+					else
+					{
+						uint16_t cmd_index = cmd_id >> 2;
+						CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
+						execExtendedCmd(cmd_index, cmd_type, call_type);
+					}
+				}
+				else
 				{
 					uint16_t cmd_index = cmd_id - getBasicCmdOffset();
 					execBasicCmd(cmd_index, call_type);
 				}
-				else
+			}
+			else
+			{
+				if constexpr (Settings::ExtendedCommands::size != 0)
 				{
 					uint16_t cmd_index = cmd_id >> 2;
 					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
 					execExtendedCmd(cmd_index, cmd_type, call_type);
 				}
-			}
-			else
-			{
-				uint16_t cmd_index = cmd_id >> 2;
-				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
-				execExtendedCmd(cmd_index, cmd_type, call_type);
 			}
 
 			if (m_last_result_code == RESULT_CODE::ERROR)
@@ -374,23 +394,34 @@ protected:
 		uint16_t cmd_id = getCurrentCmdId();
 		if constexpr ((Settings::BasicCommands::size != 0) || (Settings::AmpersandCommands::size != 0))
 		{
-			if (cmd_id >= getBasicCmdOffset())
+			if constexpr (Settings::ExtendedCommands::size != 0)
+			{
+				if (cmd_id >= getBasicCmdOffset())
+				{
+					uint16_t cmd_index = cmd_id - getBasicCmdOffset();
+					execBasicCmd(cmd_index, Command::ServerHandle::CALL_TYPE::ABORT);
+				}
+				else
+				{
+					uint16_t cmd_index = cmd_id >> 2;
+					CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
+					execExtendedCmd(cmd_index, cmd_type, Command::ServerHandle::CALL_TYPE::ABORT);
+				}
+			}
+			else
 			{
 				uint16_t cmd_index = cmd_id - getBasicCmdOffset();
 				execBasicCmd(cmd_index, Command::ServerHandle::CALL_TYPE::ABORT);
 			}
-			else
+		}
+		else
+		{
+			if constexpr (Settings::ExtendedCommands::size != 0)
 			{
 				uint16_t cmd_index = cmd_id >> 2;
 				CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
 				execExtendedCmd(cmd_index, cmd_type, Command::ServerHandle::CALL_TYPE::ABORT);
 			}
-		}
-		else
-		{
-			uint16_t cmd_index = cmd_id >> 2;
-			CMD_TYPE cmd_type = static_cast<CMD_TYPE>(cmd_id & 0x03);
-			execExtendedCmd(cmd_index, cmd_type, Command::ServerHandle::CALL_TYPE::ABORT);
 		}
 
 		if (m_last_result_code == RESULT_CODE::ASYNC)
