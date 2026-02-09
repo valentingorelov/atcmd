@@ -47,6 +47,7 @@ int main()
 
 	AsyncIoEmulator emulator(l_mutex, l_cond);
 	server.setContext(&emulator);
+	server.getCommunicationParameters().setEchoEnabled(false);
 
 	while (true)
 	{

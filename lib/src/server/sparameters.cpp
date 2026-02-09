@@ -29,7 +29,8 @@ namespace atcmd::server {
 SParameters::SParameters() :
 	m_s3{'\r'},
 	m_s4{'\n'},
-	m_verbose{true}
+	m_verbose{true},
+	m_echo_enabled{true}
 {}
 
 char SParameters::getCmdLineTerminationChar() const
@@ -60,6 +61,16 @@ bool SParameters::isVerbose() const
 void SParameters::setVerbose(bool verbose)
 {
 	m_verbose = verbose;
+}
+
+bool SParameters::isEchoEnabled() const
+{
+	return m_echo_enabled;
+}
+
+void SParameters::setEchoEnabled(bool enabled)
+{
+	m_echo_enabled = enabled;
 }
 
 }

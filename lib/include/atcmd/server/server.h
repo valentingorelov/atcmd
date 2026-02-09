@@ -29,6 +29,7 @@
 
 #include <atcmd/detail/server_cmdline.h>
 #include <atcmd/detail/characters.h>
+#include <atcmd/server/sparameters.h>
 
 namespace atcmd::server {
 
@@ -68,6 +69,11 @@ public:
 
 	void feed(char ch, bool abortable = false)
 	{
+		if (getCommunicationParameters().isEchoEnabled())
+		{
+			Base::printChar(ch);
+		}
+
 		if constexpr (Settings::ExtendedCommands::size != 0)
 		{
 			if (m_state != &Server::stateExtendedParamString)

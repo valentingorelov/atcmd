@@ -40,11 +40,16 @@ struct SParameters
 	bool isVerbose() const;
 	void setVerbose(bool verbose);
 
+	bool isEchoEnabled() const;
+	void setEchoEnabled(bool enabled);
+
 private:
 	char m_s3;
 	char m_s4;
 
 	bool m_verbose;
+
+	bool m_echo_enabled;
 };
 
 }
