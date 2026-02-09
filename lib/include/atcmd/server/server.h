@@ -40,9 +40,7 @@ struct ServerTrieHolder;
 
 template<class ExtendedCommands>
 struct ServerTrieHolder<0, ExtendedCommands>
-{
-	using m_trie = void;
-};
+{};
 
 template<std::size_t ext_cmd_size, class ExtendedCommands>
 struct ServerTrieHolder
@@ -58,6 +56,7 @@ class Server :
 		public detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>
 {
 	using Base = detail::ServerCmdline<Settings>;
+	using T = detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>;
 
 public:
 	using Base::getCommunicationParameters;
@@ -168,7 +167,7 @@ private:
 			Base::resetCmdline();
 			if constexpr (Settings::ExtendedCommands::size != 0)
 			{
-				m_trie.reset();
+				T::m_trie.reset();
 			}
 			m_state = &Server::stateBody;
 			break;
@@ -443,14 +442,14 @@ private:
 		}
 		else if (ch == '?')
 		{
-			if (!m_trie.isLeaf())
+			if (!T::m_trie.isLeaf())
 			{
 				// Unknown command name
 				m_state = &Server::stateError;
 			}
 			else
 			{
-				uint16_t cmd_index = m_trie.getCommandIndex();
+				uint16_t cmd_index = T::m_trie.getCommandIndex();
 				const detail::ExtCmdDef& cmd_def = Settings::ExtendedCommands::m_ext_cmd_defs[cmd_index];
 				if (cmd_def.getReadMethod() == nullptr)
 				{
@@ -470,14 +469,14 @@ private:
 		}
 		else if ((ch == ';') || (ch == getCommunicationParameters().getCmdLineTerminationChar()))
 		{
-			if (!m_trie.isLeaf())
+			if (!T::m_trie.isLeaf())
 			{
 				// Unknown command name
 				m_state = &Server::stateError;
 			}
 			else
 			{
-				uint16_t cmd_index = m_trie.getCommandIndex();
+				uint16_t cmd_index = T::m_trie.getCommandIndex();
 				const detail::ExtCmdDef& cmd_def = Settings::ExtendedCommands::m_ext_cmd_defs[cmd_index];
 				if (cmd_def.getWriteMethod() == nullptr)
 				{
@@ -502,7 +501,7 @@ private:
 						}
 						else
 						{
-							m_trie.reset();
+							T::m_trie.reset();
 							m_state = &Server::stateBody;
 						}
 					}
@@ -512,7 +511,7 @@ private:
 		else
 		{
 			// Parsing the command name
-			if (!m_trie.feed(ch))
+			if (!T::m_trie.feed(ch))
 			{
 				// Unknown command name
 				m_state = &Server::stateError;
@@ -526,14 +525,14 @@ private:
 		{
 			return;
 		}
-		if (!m_trie.isLeaf())
+		if (!T::m_trie.isLeaf())
 		{
 			// Unknown command name
 			m_state = &Server::stateError;
 			return;
 		}
 
-		uint16_t cmd_index = m_trie.getCommandIndex();
+		uint16_t cmd_index = T::m_trie.getCommandIndex();
 
 		if (ch == '?')
 		{
@@ -595,7 +594,7 @@ private:
 		else if (ch == ';')
 		{
 			finalizeBasicCmd();
-			m_trie.reset();
+			T::m_trie.reset();
 			m_state = &Server::stateBody;
 		}
 		else
@@ -611,7 +610,7 @@ private:
 		{
 			return true;
 		}
-		uint16_t cmd_index = m_trie.getCommandIndex();
+		uint16_t cmd_index = T::m_trie.getCommandIndex();
 		const detail::ExtCmdDef& cmd_def = Settings::ExtendedCommands::m_ext_cmd_defs[cmd_index];
 		if (ch == ',')
 		{
@@ -639,7 +638,7 @@ private:
 			}
 			else
 			{
-				m_trie.reset();
+				T::m_trie.reset();
 				m_state = &Server::stateBody;
 			}
 			return true;
@@ -910,7 +909,7 @@ private:
 			}
 			else
 			{
-				m_trie.reset();
+				T::m_trie.reset();
 				m_state = &Server::stateBody;
 			}
 		}
@@ -952,7 +951,7 @@ private:
 
 	const detail::ExtCmdDef& getCmdDef() const
 	{
-		return Settings::ExtendedCommands::m_ext_cmd_defs[m_trie.getCommandIndex()];
+		return Settings::ExtendedCommands::m_ext_cmd_defs[T::m_trie.getCommandIndex()];
 	}
 
 	// Write parameter parsing
@@ -1030,7 +1029,7 @@ private:
 			}
 			else
 			{
-				m_trie.reset();
+				T::m_trie.reset();
 				m_state = &Server::stateBody;
 			}
 		}
