@@ -57,9 +57,11 @@ class Server :
 		public detail::ServerCmdline<Settings>,
 		public detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>
 {
-	using detail::ServerTrieHolder<Settings::ExtendedCommands::size, typename Settings::ExtendedCommands>::m_trie;
+	using Base = detail::ServerCmdline<Settings>;
 
 public:
+	using Base::getCommunicationParameters;
+
 	Server(PrintCharCallback print_char_callback, void* context = nullptr) :
 		detail::ServerCmdline<Settings>(print_char_callback, context),
 		m_state{&Server::stateA}
@@ -120,8 +122,6 @@ public:
 	}
 
 private:
-	using Base = detail::ServerCmdline<Settings>;
-
 	using Base::checkParameterBufferOvf;
 	using Base::addBasicCmd;
 	using Base::addExtCmd;
@@ -141,7 +141,6 @@ private:
 	using Base::m_param_hex_string;
 	using Base::m_basic_cmd_index;
 	using Base::m_param_index;
-	using Base::getCommunicationParameters;
 
 	// State machine states
 	using State = void (Server::*)(char, bool);
