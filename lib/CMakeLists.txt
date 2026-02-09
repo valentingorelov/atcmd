@@ -1,3 +1,9 @@
+cmake_minimum_required(VERSION 3.28.0)
+
+project(atcmd_lib
+  VERSION 0.0.1
+  LANGUAGES CXX)
+
 # Library sources
 set(LIB_SOURCES
     src/characters.cpp
