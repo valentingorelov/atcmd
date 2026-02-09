@@ -56,7 +56,6 @@ Even though linear search would still qualify as O(1) because the alphabet is co
 ## Limitations
 
 ### Current Implementation Restrictions
-- **Asynchronous command execution**: Not fully implemented
 - **Command line editing character not supported**: S5 parameter is not supported, because there is no raw command line buffer in the current architecture
 
 ### Design Constraints
