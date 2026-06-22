@@ -26,6 +26,7 @@
 
 #include <array>
 #include <cstring>
+#include <algorithm>
 
 static std::array<uint8_t, 20> l_r1;
 static std::size_t l_r1_size;
