@@ -63,6 +63,13 @@ if(ATCMD_BUILD_EXAMPLES)
                 "  -ATCMD_ZEPHYR_VENV=/path/to/your/zephyr/python/virtual/environment/bin"
             )
         endif()
+        if(NOT DEFINED ATCMD_ZEPHYR_BASE OR ATCMD_ZEPHYR_BASE STREQUAL "")
+            message(FATAL_ERROR
+                "ATCMD_ZEPHYR_BASE is not set. "
+                "Please pass it on the command line, e.g.\n"
+                "  -ATCMD_ZEPHYR_BASE=/path/to/your/zephyr/repository"
+            )
+        endif()
 
 
         include(ExternalProject)
@@ -74,15 +81,20 @@ if(ATCMD_BUILD_EXAMPLES)
           CONFIGURE_COMMAND
             ${CMAKE_COMMAND} -E env
               "PATH=${ATCMD_ZEPHYR_VENV}:$ENV{PATH}"
+              "ZEPHYR_BASE=${ATCMD_ZEPHYR_BASE}"
             ${CMAKE_COMMAND}
               -S <SOURCE_DIR> -B <BINARY_DIR>
               -DBOARD=esp32c3_devkitm
+              -DCMAKE_SYSTEM_NAME=Generic
               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER_RISCV64}
               -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER_RISCV64}
+              -DCMAKE_C_COMPILER_WORKS=1
+              -DCMAKE_CXX_COMPILER_WORKS=1
 
           BUILD_COMMAND
             ${CMAKE_COMMAND} -E env
               "PATH=${ATCMD_ZEPHYR_VENV}:$ENV{PATH}"
+              "ZEPHYR_BASE=${ATCMD_ZEPHYR_BASE}"
             ${CMAKE_COMMAND} --build <BINARY_DIR>
 
           INSTALL_COMMAND ""
