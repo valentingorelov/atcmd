@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "Atcmd Zephyr Example"
+
+module = BLESERIAL
+module-str = bleserial
+source "subsys/logging/Kconfig.template.log_config"
+
+config $(module)_TX_TIMEOUT
+        int "AT command responses are sent after this timeout in ms has expired even if there are no flushing characters"
+        default 100
+
+module = HWSERIAL
+module-str = hwserial
+source "subsys/logging/Kconfig.template.log_config"
+
+# Sources Kconfig.zephyr in the Zephyr root directory.
+#
+# Note: All 'source' statements work relative to the Zephyr root directory (due
+# to the $srctree environment variable being set to $ZEPHYR_BASE). If you want
+# to 'source' relative to the current Kconfig file instead, use 'rsource' (or a
+# path relative to the Zephyr root).
+source "Kconfig.zephyr"

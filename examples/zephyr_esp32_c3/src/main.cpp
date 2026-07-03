@@ -23,58 +23,51 @@
  */
 
 #include <zephyr/kernel.h>
-#include <zephyr/device.h>
-#include <zephyr/drivers/uart.h>
 
-#include <atcmd/server/server.h>
+#include "atserver.h"
+#include "bleserial.h"
+#include "hwserial.h"
 
 #define UART_DEVICE_NODE DT_CHOSEN(zephyr_shell_uart)
-static const struct device *const uart_dev = DEVICE_DT_GET(UART_DEVICE_NODE);
+static const device* const uart_dev = DEVICE_DT_GET(UART_DEVICE_NODE);
 
-K_PIPE_DEFINE(rx_buf, 100, 1);
+K_PIPE_DEFINE(uart_rx_pipe, 128, 1);
+K_PIPE_DEFINE(uart_tx_pipe, 128, 1);
 
-static void printChar(char ch, void* /*context*/)
-{
-	printk("%c", ch);
-}
+K_PIPE_DEFINE(ble_rx_pipe, 128, 1);
+K_PIPE_DEFINE(ble_tx_pipe, 128, 1);
 
-struct ServerSettings
-{
-	using BasicCommands = atcmd::server::BasicCommandList<>;
-	using AmpersandCommands = atcmd::server::AmpersandCommandList<>;
-	using ExtendedCommands = atcmd::server::ExtendedCommandList<>;
-
-	static constexpr std::size_t max_commands_per_line = 3;
+static struct k_poll_event events[4] = {
+    K_POLL_EVENT_STATIC_INITIALIZER(K_POLL_TYPE_PIPE_DATA_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &uart_rx_pipe, 0),
+    K_POLL_EVENT_STATIC_INITIALIZER(K_POLL_TYPE_PIPE_DATA_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &uart_tx_pipe, 0),
+    K_POLL_EVENT_STATIC_INITIALIZER(K_POLL_TYPE_PIPE_DATA_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &ble_rx_pipe, 0),
+    K_POLL_EVENT_STATIC_INITIALIZER(K_POLL_TYPE_PIPE_DATA_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &ble_tx_pipe, 0),
 };
-
-static atcmd::server::Server<ServerSettings> server(printChar);
-
-static void usart_irq_cb(const struct device *dev, void *user_data)
-{
-	uart_irq_update(dev);
-
-	if (uart_irq_rx_ready(dev))
-	{
-		uint8_t data;
-		while (uart_fifo_read(dev, &data, 1))
-		{
-			k_pipe_write(&rx_buf, &data, 1, K_NO_WAIT);
-		}
-	}
-}
 
 int main(void)
 {
-	//server.getCommunicationParameters().setCmdLineTerminationChar('\n');
+    AtServer server_serial(uart_rx_pipe, events[0], uart_tx_pipe);
+    HwSerial hw_serial(*uart_dev, uart_rx_pipe, uart_tx_pipe, events[1]);
 
-	uart_irq_callback_user_data_set(uart_dev, usart_irq_cb, (void *)uart_dev);
-	uart_irq_rx_enable(uart_dev);
+    AtServer server_ble(ble_rx_pipe, events[2], ble_tx_pipe);
+    BleSerial hw_ble(server_ble, ble_rx_pipe, ble_tx_pipe, events[3]);
 
-	uint8_t data;
-	while (k_pipe_read(&rx_buf, &data, 1, K_FOREVER))
+	while (true)
 	{
-		server.feed(static_cast<char>(data), false);
-	}
+		int rc = k_poll(events, ARRAY_SIZE(events), K_FOREVER);
+		if (rc == 0)
+		{
+            server_serial.processRxData();
+            hw_serial.processTxData();
+
+            server_ble.processRxData();
+            hw_ble.processTxData();
+        }
+        events[0].state = K_POLL_STATE_NOT_READY;
+        events[1].state = K_POLL_STATE_NOT_READY;
+        events[2].state = K_POLL_STATE_NOT_READY;
+        events[3].state = K_POLL_STATE_NOT_READY;
+    }
 
 	return 0;
 }
