@@ -1,1 +1,4 @@
 *.user
+.qtcreator
+build
+**/.DS_Store
