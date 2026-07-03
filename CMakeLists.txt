@@ -5,7 +5,7 @@ cmake_policy(SET CMP0077 NEW)
 
 # Main project
 project(atcmd
-    VERSION 0.0.1
+    VERSION 0.2.0
     LANGUAGES CXX)
 
 # Configuration options
